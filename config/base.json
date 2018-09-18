@@ -1,5 +1,6 @@
 {
     "includeNotices": true,
     "includeWarnings": true,
-    "standard": "WCAG2AAA"
+    "standard": "WCAG2AAA",
+    "timeout": 3000
 }

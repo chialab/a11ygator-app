@@ -11,7 +11,7 @@ app.get('/', async function (req, res) {
     const options = req.query;
     delete options.url;
     const result = await chia11y(url, options);
-    return res.send('$i$i$i$i$i')
+    return res.send(result);
 })
 
 app.listen(9000);
