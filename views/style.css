@@ -1,0 +1,29 @@
+body {
+    background-color: grey;
+}
+
+.page-url {
+    font-size: 1em;
+}
+
+.issues-container {
+    margin: 0 auto;
+    list-style: none;
+}
+
+.issue {
+    margin-bottom: 15px;
+}
+
+.error {
+    background-color: red;
+}
+
+.warning {
+    background-color: gold;
+}
+
+.notice {
+    background-color: skyblue;
+}
+

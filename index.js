@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const chia11y = require('./src/chia11y');
+const chia11y = require('./server/chia11y');
 
 app.get('/', async function (req, res) {
     const url = req.query && req.query.url;
@@ -11,7 +11,9 @@ app.get('/', async function (req, res) {
     const options = req.query;
     delete options.url;
     const result = await chia11y(url, options);
-    return res.send(result);
+    result.documentTitle = `Chia11y - ${result.documentTitle}`;
+    console.log(result)
+    res.render('index.pug', result);
 })
 
 app.listen(9000);

@@ -15,6 +15,11 @@ async function chia11y(url, options) {
     const pa11yConfig = {};
     _.merge(pa11yConfig, config, options)
     const cleanedUrl = url.replace(/(^\w+:|^)\/\//, ''); // pa11y doesn't like the boring 'http' part
+    if (pa11yConfig.screenCapture) {
+        const filename = cleanedUrl.split('/').join('_');
+        console.log('fi', filename);
+        pa11yConfig.screenCapture = `${__dirname}/screenshots/${filename}.png`;
+    }
     convertBooleans(pa11yConfig);
 
     let result;

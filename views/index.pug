@@ -1,0 +1,20 @@
+html
+  head
+    style
+      include style.css
+    title= documentTitle
+    script
+      include gui.js
+  body
+    div(class='page-url')= pageUrl
+    ul(class='issues-container')
+      each issue in issues
+        li(class=`issue ${issue.type}`)
+          p= issue.code
+          p= issue.context
+          p= issue.message
+          p= issue.type
+          p= issue.selector
+
+
+
