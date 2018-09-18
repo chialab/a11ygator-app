@@ -8,8 +8,13 @@
     "url": "git@gitlab.com:chialab/chia11y.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "author": "Chialab",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.3",
+    "lodash": "^4.17.11",
+    "pa11y": "^5.0.4"
+  }
 }
