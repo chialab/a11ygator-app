@@ -1,0 +1,15 @@
+{
+  "name": "chia11y",
+  "version": "1.0.0",
+  "description": "A web dashboard for accessibility tests results.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.com:chialab/chia11y.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chialab",
+  "license": "MIT"
+}
