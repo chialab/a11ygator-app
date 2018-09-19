@@ -12,8 +12,8 @@ app.get('/', async function (req, res) {
     delete options.url;
     const result = await chia11y(url, options);
     result.documentTitle = `Chia11y - ${result.documentTitle}`;
-    console.log(result)
-    res.render('index.pug', result);
+    // res.render('index.pug', result);
+    res.send(result)
 })
 
 app.listen(9000);

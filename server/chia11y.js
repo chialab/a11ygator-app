@@ -1,7 +1,8 @@
 const pa11y = require('pa11y');
-const config = require('../config/base.json');
+const config = require('../config/base');
 const _ = require('lodash');
 
+const htmlReporter = require('pa11y-reporter-html');
 module.exports = chia11y;
 
 /**
@@ -14,18 +15,18 @@ module.exports = chia11y;
 async function chia11y(url, options) {
     const pa11yConfig = {};
     _.merge(pa11yConfig, config, options)
-    const cleanedUrl = url.replace(/(^\w+:|^)\/\//, ''); // pa11y doesn't like the boring 'http' part
     if (pa11yConfig.screenCapture) {
-        const filename = cleanedUrl.split('/').join('_');
-        console.log('fi', filename);
+        const filename = url.replace(/[/:.]/g, '_');
         pa11yConfig.screenCapture = `${__dirname}/screenshots/${filename}.png`;
     }
     convertBooleans(pa11yConfig);
 
     let result;
-    return pa11y(cleanedUrl, pa11yConfig)
+    return pa11y(url, pa11yConfig)
         .then((res) => {
-            return Promise.resolve(res);
+            // convert result in html
+            const html = htmlReporter.results(res, url);
+            return Promise.resolve(html);
         })
         .catch((err) => {
             console.error('Failed to execute pa11y', err);
