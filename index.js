@@ -1,18 +1,24 @@
 const express = require('express')
 const app = express()
-const chia11y = require('./server/chia11y');
+const chia11y = require('./chia11y');
+const addImageToHtml = require('./chia11y');
+var bodyParser = require('body-parser')
 
-app.get('/', async function (req, res) {
+app.use( bodyParser.json() );
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use("/screenshots", express.static(__dirname + '/screenshots'));
+
+app.all('/', async function (req, res) {
     const url = req.query && req.query.url;
     if (!url) {
         res.status(400);
         return res.send('Missing url');
     }
-    const options = req.query;
+    const options = req.body;
     delete options.url;
     const result = await chia11y(url, options);
-    result.documentTitle = `Chia11y - ${result.documentTitle}`;
-    // res.render('index.pug', result);
     res.send(result)
 })
 
