@@ -11,4 +11,9 @@ module.exports = {
             '--single-process'
         ]
     },
+    log: {
+        debug: console.log,
+        error: console.error,
+        info: console.info
+    },
 }
