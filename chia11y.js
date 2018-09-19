@@ -26,7 +26,9 @@ async function chia11y(url, options) {
         .then(async function (res){
             // convert result in html
             let html = await htmlReporter.results(res, url);
+
             html = addImageToHtml(html, url);
+            html = addDocumentTitleToHtml(html, res.documentTitle, url);
             return Promise.resolve(html);
         })
         .catch((err) => {
@@ -69,7 +71,6 @@ parseFilename = function(url) {
  */
 addImageToHtml = function(html, filename) {
     // modify html
-
     let modifiedHtml = html;
     const htmlInsertIndex = modifiedHtml.indexOf('<p class="counts">') - 1;
     const imgString = `<img class="screenshot" src="/screenshots/${parseFilename(filename)}.png"/>`;
@@ -78,6 +79,17 @@ addImageToHtml = function(html, filename) {
     // modify inline css
     const cssInsertIndex = modifiedHtml.indexOf('<style>') + ('<style>').length + 1;
     modifiedHtml = modifiedHtml.slice(0, cssInsertIndex) + '.screenshot { border: 1px solid black; max-width: 100%; margin: 2em auto; display: block }' + modifiedHtml.slice(cssInsertIndex);
-
     return modifiedHtml;
+}
+
+/**
+ * It replaces given title with current html title.
+ * @param {String} html html as string to modify
+ * @param {String} title document title
+ * @param {String} url url to replace
+ * @return {String} modified string
+ */
+addDocumentTitleToHtml = function(html, title, url) {
+    // modify title html
+    return html.replace(/Accessibility Report For "[^"]*"/gi, `Accessibility Report For "${title}"`);
 }
