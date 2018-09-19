@@ -28,7 +28,7 @@ async function chia11y(url, options) {
             let html = await htmlReporter.results(res, url);
 
             html = addImageToHtml(html, url);
-            html = addDocumentTitleToHtml(html, res.documentTitle, url);
+            html = addDocumentTitleToHtml(html, res.documentTitle);
             return Promise.resolve(html);
         })
         .catch((err) => {
@@ -86,10 +86,9 @@ addImageToHtml = function(html, filename) {
  * It replaces given title with current html title.
  * @param {String} html html as string to modify
  * @param {String} title document title
- * @param {String} url url to replace
  * @return {String} modified string
  */
-addDocumentTitleToHtml = function(html, title, url) {
+addDocumentTitleToHtml = function(html, title) {
     // modify title html
     return html.replace(/Accessibility Report For "[^"]*"/gi, `Accessibility Report For "${title}"`);
 }
