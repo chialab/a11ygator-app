@@ -18,5 +18,8 @@
     "lodash": "^4.17.11",
     "pa11y": "github:edoardocavazza/pa11y",
     "pa11y-reporter-html": "^1.0.0"
+  },
+  "engines": {
+    "node": "8.12.0"
   }
 }
