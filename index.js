@@ -4,6 +4,8 @@ const chia11y = require('./chia11y');
 const addImageToHtml = require('./chia11y');
 var bodyParser = require('body-parser')
 
+const PORT = process.env.PORT || 9000;
+
 app.use( bodyParser.json() );
 app.use(bodyParser.urlencoded({
   extended: true
@@ -22,4 +24,4 @@ app.all('/', async function (req, res) {
     res.send(result)
 })
 
-app.listen(9000);
+app.listen(PORT);
