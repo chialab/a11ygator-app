@@ -88,7 +88,7 @@ addImageToHtml = function(html, filename) {
     const cssInsertIndex = modifiedHtml.indexOf('<style>') + ('<style>').length + 1;
     const css =
         `.screenshot { max-width: 100%;display: block; }
-        .screenshot-container { border: solid #d5d5d5; border-width: 30px 4px 4px; border-radius: 4px; overflow: scroll; max-height: 500px: max-width: 100%; margin: 2em auto; display: block;}
+        .screenshot-container { border: solid #d5d5d5; border-width: 30px 4px 4px; border-radius: 4px; overflow: scroll; max-height: 500px; margin: 2em auto; display: block;}
         .buttons-container { position: absolute; margin-top: -24px; margin-left: 5px; }
         .button-osx { width: 10px; height: 10px; display: inline-block; border-radius: 10px;}
         .close {background: #ff5c5c; border: 1px solid #e33e41;}
