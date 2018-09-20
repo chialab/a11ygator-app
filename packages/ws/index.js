@@ -9,7 +9,8 @@ app.use( bodyParser.json() );
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-app.use("/screenshots", express.static(__dirname + '/screenshots'));
+
+app.use("/packages/ws/screenshots", express.static(__dirname + '/screenshots'));
 
 app.all('/', async function (req, res) {
     const url = req.query && req.query.url;

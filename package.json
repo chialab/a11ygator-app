@@ -13,5 +13,7 @@
   },
   "author": "Chialab",
   "license": "MIT",
-  "workspaces": ["packages/*"]
+  "workspaces": [
+    "packages/*"
+  ]
 }
