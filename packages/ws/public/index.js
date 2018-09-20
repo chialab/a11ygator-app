@@ -1,0 +1,3 @@
+sendData = function() {
+    alert('sisisi')
+}

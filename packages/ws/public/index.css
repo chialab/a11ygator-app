@@ -1,0 +1,46 @@
+.form-container {
+    background-color: grey;
+}
+
+.screenshot {
+    display: block;
+    max-width: 100%;
+}
+
+.screenshot-container {
+    display: block;
+    max-height: 500px;
+    margin: 2em auto;
+    overflow: scroll;
+    border: solid #d5d5d5;
+    border-width: 30px 4px 4px;
+    border-radius: 4px;
+}
+
+.buttons-container {
+    position: absolute;
+    margin-top: -24px;
+    margin-left: 5px;
+}
+
+.button-osx {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+}
+
+.close {
+    background: #ff5c5c;
+    border: 1px solid #e33e41;
+}
+
+.minimize {
+    background: #ffbd4c;
+    border: 1px solid #e09e3e;
+}
+
+.zoom {
+    background: #00ca56;
+    border: 1px solid #14ae46;
+}

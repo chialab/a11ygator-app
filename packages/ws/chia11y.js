@@ -25,8 +25,7 @@ async function chia11y(url, options) {
     return pa11y(url, pa11yConfig)
         .then(async function (res){
             res.issues = orderIssuesByTypeCode(res.issues);
-
-            return Promise.resolve(html);
+            return Promise.resolve(res);
         })
         .catch((err) => {
             console.error('Failed to execute pa11y', err);

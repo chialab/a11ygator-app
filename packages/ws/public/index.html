@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <script type="text/javascript" src="index.js"></script>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div class="form-container">
+        <form name="site-form" onsubmit="sendData()">
+
+            <div class="site-url-container">
+                <input type="text" name="input-site-url" placeholder="type a url">
+            </div>
+
+            <div class="options-container">
+                <select name="input-site-standard">
+                    <option value="Section508">Section508</option>
+                    <option value="WCAG2A">WCAG2A</option>
+                    <option value="WCAG2AA">WCAG2AA</option>
+                    <option value="WCAG2AAA">WCAG2AAA</option>
+                </select>
+                <input type="numeric" name="input-site-wait" placeholder="8000">
+            </div>
+
+            <input type="submit" value="CHECK">
+
+            <div class="result-container">
+                <div class="screenshot-container">
+                    <div class="buttons-container">
+                        <div class="button-osx close"></div>
+                        <div class="button-osx minimize"></div>
+                        <div class="button-osx zoom"></div>
+                    </div>
+                    <!-- <img class="screenshot" src="/screenshots/${parseFilename(filename)}.png" /> -->
+                </div>
+            </div>
+        </form>
+    </div>
+</body>
+
+</html>
