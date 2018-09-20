@@ -1,7 +1,6 @@
 const express = require('express')
 const app = express()
 const chia11y = require('./chia11y');
-const addImageToHtml = require('./chia11y');
 var bodyParser = require('body-parser')
 
 const PORT = process.env.PORT || 9000;

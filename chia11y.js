@@ -14,20 +14,21 @@ module.exports = chia11y;
  */
 async function chia11y(url, options) {
     const pa11yConfig = {};
+    // merge base config with query options
     _.merge(pa11yConfig, config, options)
 
-    // alway make a screenshot
+    // always make a screenshot
     const filename = parseFilename(url);
     pa11yConfig.screenCapture = `${__dirname}/screenshots/${filename}.png`;
 
-    convertBooleans(pa11yConfig);
+    convertBooleans(pa11yConfig);   // parse configuration's boolean-like values
 
     return pa11y(url, pa11yConfig)
         .then(async function (res){
-            // convert result in html
-            res.issues = orderByTypeCode(res.issues);
-            let html = await htmlReporter.results(res, url);
+            res.issues = orderIssuesByTypeCode(res.issues);
 
+            // convert result in html
+            let html = await htmlReporter.results(res, url);
             html = addImageToHtml(html, url);
             html = addDocumentTitleToHtml(html, res.documentTitle);
             return Promise.resolve(html);
@@ -40,10 +41,11 @@ async function chia11y(url, options) {
 
 /**
  * Sort issues based on their criticity. It uses typecode property.
+ *
  * @param {Array<Object>} issues issues to sort
  * @returns {Array<Object>} sorted issues
  */
-orderByTypeCode = function(issues) {
+orderIssuesByTypeCode = function(issues) {
     return issues.sort((a, b) => parseFloat(a.typeCode) - parseFloat(b.typeCode));
 }
 
@@ -66,6 +68,7 @@ convertBooleans = function(obj) {
 
 /**
  * Sobstitute '/' char with '_' in given string.
+ *
  * @param {String} url
  * @return {String} modified string
  */
@@ -75,6 +78,7 @@ parseFilename = function(url) {
 
 /**
  * It adds an image element with 'filename' param as src on the given html.
+ *
  * @param {String} html html as string to modify
  * @param {String} filename image filename
  * @return {String} modified string
@@ -104,8 +108,8 @@ addImageToHtml = function(html, filename) {
         .close {background: #ff5c5c; border: 1px solid #e33e41;}
         .minimize {background: #ffbd4c; border: 1px solid #e09e3e;}
         .zoom {background: #00ca56; border: 1px solid #14ae46;}`;
-
     modifiedHtml = modifiedHtml.slice(0, cssInsertIndex) + css + modifiedHtml.slice(cssInsertIndex);
+
     return modifiedHtml;
 }
 
