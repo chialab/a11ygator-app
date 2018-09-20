@@ -25,6 +25,7 @@ async function chia11y(url, options) {
     return pa11y(url, pa11yConfig)
         .then(async function (res){
             // convert result in html
+            res.issues = orderByTypeCode(res.issues);
             let html = await htmlReporter.results(res, url);
 
             html = addImageToHtml(html, url);
@@ -35,6 +36,15 @@ async function chia11y(url, options) {
             console.error('Failed to execute pa11y', err);
             return Promise.reject(err);
         })
+}
+
+/**
+ * Sort issues based on their criticity. It uses typecode property.
+ * @param {Array<Object>} issues issues to sort
+ * @returns {Array<Object>} sorted issues
+ */
+orderByTypeCode = function(issues) {
+    return issues.sort((a, b) => parseFloat(a.typeCode) - parseFloat(b.typeCode));
 }
 
 /**
