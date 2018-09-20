@@ -1,5 +1,5 @@
 const pa11y = require('pa11y');
-const config = require('./config/base');
+const config = require('@chialab/chia11y-config');
 const _ = require('lodash');
 
 const htmlReporter = require('pa11y-reporter-html');

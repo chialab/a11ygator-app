@@ -1,5 +1,6 @@
 {
   "name": "chia11y",
+  "private": true,
   "version": "1.0.0",
   "description": "A web dashboard for accessibility tests results.",
   "main": "index.js",
@@ -8,18 +9,9 @@
     "url": "git@gitlab.com:chialab/chia11y.git"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node packages/ws/index.js"
   },
   "author": "Chialab",
   "license": "MIT",
-  "dependencies": {
-    "body-parser": "^1.18.3",
-    "express": "^4.16.3",
-    "lodash": "^4.17.11",
-    "pa11y": "github:edoardocavazza/pa11y",
-    "pa11y-reporter-html": "^1.0.0"
-  },
-  "engines": {
-    "node": "8.12.0"
-  }
+  "workspaces": ["packages/*"]
 }

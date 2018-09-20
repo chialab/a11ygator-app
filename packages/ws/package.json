@@ -1,0 +1,20 @@
+{
+  "name": "@chialab/chia11y-ws",
+  "version": "1.0.0",
+  "description": "A web dashboard for accessibility tests results.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.com:chialab/chia11y.git"
+  },
+  "author": "Chialab",
+  "license": "MIT",
+  "dependencies": {
+    "@chialab/chia11y-config": "^1.0.0",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "lodash": "^4.17.11",
+    "pa11y": "github:edoardocavazza/pa11y",
+    "pa11y-reporter-html": "^1.0.0"
+  }
+}
