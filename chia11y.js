@@ -73,12 +73,29 @@ addImageToHtml = function(html, filename) {
     // modify html
     let modifiedHtml = html;
     const htmlInsertIndex = modifiedHtml.indexOf('<p class="counts">') - 1;
-    const imgString = `<img class="screenshot" src="/screenshots/${parseFilename(filename)}.png"/>`;
+    const imgString =
+        `<div class='screenshot-container'>
+            <div class="buttons-container">
+                <div class="button-osx close"></div>
+                <div class="button-osx minimize"></div>
+                <div class="button-osx zoom"></div>
+            </div>
+            <img class="screenshot" src="/screenshots/${parseFilename(filename)}.png"/>
+        </div>`;
     modifiedHtml = modifiedHtml.slice(0, htmlInsertIndex) + imgString + modifiedHtml.slice(htmlInsertIndex);
 
     // modify inline css
     const cssInsertIndex = modifiedHtml.indexOf('<style>') + ('<style>').length + 1;
-    modifiedHtml = modifiedHtml.slice(0, cssInsertIndex) + '.screenshot { border: 1px solid black; max-width: 100%; margin: 2em auto; display: block }' + modifiedHtml.slice(cssInsertIndex);
+    const css =
+        `.screenshot { max-width: 100%;display: block; }
+        .screenshot-container { border: solid #d5d5d5; border-width: 30px 4px 4px; border-radius: 4px; overflow: scroll; max-height: 500px: max-width: 100%; margin: 2em auto; display: block;}
+        .buttons-container { position: absolute; margin-top: -24px; margin-left: 5px; }
+        .button-osx { width: 10px; height: 10px; display: inline-block; border-radius: 10px;}
+        .close {background: #ff5c5c; border: 1px solid #e33e41;}
+        .minimize {background: #ffbd4c; border: 1px solid #e09e3e;}
+        .zoom {background: #00ca56; border: 1px solid #14ae46;}`;
+
+    modifiedHtml = modifiedHtml.slice(0, cssInsertIndex) + css + modifiedHtml.slice(cssInsertIndex);
     return modifiedHtml;
 }
 
