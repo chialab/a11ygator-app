@@ -10,9 +10,9 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-app.use("/screenshots", express.static(__dirname + '/screenshots'));
+app.use('/screenshots', express.static(__dirname + '/screenshots'));
 
-app.get('/app', async function (req, res) {
+app.all('/', async function (req, res) {
     const url = req.query && req.query.url;
     if (!url) {
         res.status(400);
