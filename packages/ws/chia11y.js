@@ -2,7 +2,6 @@ const pa11y = require('pa11y');
 const config = require('@chialab/chia11y-config');
 const _ = require('lodash');
 
-const htmlReporter = require('pa11y-reporter-html');
 module.exports = chia11y;
 
 /**
@@ -27,10 +26,6 @@ async function chia11y(url, options) {
         .then(async function (res){
             res.issues = orderIssuesByTypeCode(res.issues);
 
-            // convert result in html
-            let html = await htmlReporter.results(res, url);
-            html = addImageToHtml(html, url);
-            html = addDocumentTitleToHtml(html, res.documentTitle);
             return Promise.resolve(html);
         })
         .catch((err) => {
