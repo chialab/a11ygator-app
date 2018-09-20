@@ -32,5 +32,5 @@ body: {
 }
 ```
 
-See https://github.com/pa11y/pa11y-dashboard for more info.
+See https://github.com/pa11y/pa11y more info.
 
