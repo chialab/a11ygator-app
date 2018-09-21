@@ -1,6 +1,7 @@
 const pa11y = require('pa11y');
 const config = require('@chialab/chia11y-config');
 const _ = require('lodash');
+const htmlReporter = require('@chialab/pa11y-reporter-html');
 
 module.exports = chia11y;
 
@@ -24,23 +25,14 @@ async function chia11y(url, options) {
 
     return pa11y(url, pa11yConfig)
         .then(async function (res){
-            res.issues = orderIssuesByTypeCode(res.issues);
+            res.screenPath = pa11yConfig.screenCapture;
+            const htmlReport = htmlReporter.results(res);
             return Promise.resolve(res);
         })
         .catch((err) => {
             console.error('Failed to execute pa11y', err);
             return Promise.reject(err);
         })
-}
-
-/**
- * Sort issues based on their criticity. It uses typecode property.
- *
- * @param {Array<Object>} issues issues to sort
- * @returns {Array<Object>} sorted issues
- */
-orderIssuesByTypeCode = function(issues) {
-    return issues.sort((a, b) => parseFloat(a.typeCode) - parseFloat(b.typeCode));
 }
 
 /**
