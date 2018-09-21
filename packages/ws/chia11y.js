@@ -2,6 +2,7 @@ const pa11y = require('pa11y');
 const config = require('@chialab/chia11y-config');
 const _ = require('lodash');
 const htmlReporter = require('@chialab/pa11y-reporter-html');
+const DomParser = require('dom-parser');
 
 module.exports = chia11y;
 
@@ -19,15 +20,16 @@ async function chia11y(url, options) {
 
     // always make a screenshot
     const filename = parseFilename(url);
-    pa11yConfig.screenCapture = `${__dirname}/screenshots/${filename}.png`;
+    const screenPath = `/screenshots/${filename}.png`;
+    pa11yConfig.screenCapture = `${__dirname}${screenPath}`;
 
     convertBooleans(pa11yConfig);   // parse configuration's boolean-like values
 
     return pa11y(url, pa11yConfig)
         .then(async function (res){
-            res.screenPath = pa11yConfig.screenCapture;
-            const htmlReport = htmlReporter.results(res);
-            return Promise.resolve(res);
+            res.screenPath = screenPath;
+            const htmlReport = await htmlReporter.results(res);
+            return Promise.resolve(htmlReport);
         })
         .catch((err) => {
             console.error('Failed to execute pa11y', err);
@@ -60,52 +62,4 @@ convertBooleans = function(obj) {
  */
 parseFilename = function(url) {
     return url.replace(/[/:.]/g, '_');
-}
-
-/**
- * It adds an image element with 'filename' param as src on the given html.
- *
- * @param {String} html html as string to modify
- * @param {String} filename image filename
- * @return {String} modified string
- */
-addImageToHtml = function(html, filename) {
-    // modify html
-    let modifiedHtml = html;
-    const htmlInsertIndex = modifiedHtml.indexOf('<p class="counts">') - 1;
-    const imgString =
-        `<div class='screenshot-container'>
-            <div class="buttons-container">
-                <div class="button-osx close"></div>
-                <div class="button-osx minimize"></div>
-                <div class="button-osx zoom"></div>
-            </div>
-            <img class="screenshot" src="/screenshots/${parseFilename(filename)}.png"/>
-        </div>`;
-    modifiedHtml = modifiedHtml.slice(0, htmlInsertIndex) + imgString + modifiedHtml.slice(htmlInsertIndex);
-
-    // modify inline css
-    const cssInsertIndex = modifiedHtml.indexOf('<style>') + ('<style>').length + 1;
-    const css =
-        `.screenshot { max-width: 100%;display: block; }
-        .screenshot-container { border: solid #d5d5d5; border-width: 30px 4px 4px; border-radius: 4px; overflow: scroll; max-height: 500px; margin: 2em auto; display: block;}
-        .buttons-container { position: absolute; margin-top: -24px; margin-left: 5px; }
-        .button-osx { width: 10px; height: 10px; display: inline-block; border-radius: 10px;}
-        .close {background: #ff5c5c; border: 1px solid #e33e41;}
-        .minimize {background: #ffbd4c; border: 1px solid #e09e3e;}
-        .zoom {background: #00ca56; border: 1px solid #14ae46;}`;
-    modifiedHtml = modifiedHtml.slice(0, cssInsertIndex) + css + modifiedHtml.slice(cssInsertIndex);
-
-    return modifiedHtml;
-}
-
-/**
- * It replaces given title with current html title.
- * @param {String} html html as string to modify
- * @param {String} title document title
- * @return {String} modified string
- */
-addDocumentTitleToHtml = function(html, title) {
-    // modify title html
-    return html.replace(/Accessibility Report For "[^"]*"/gi, `Accessibility Report For "${title}"`);
 }

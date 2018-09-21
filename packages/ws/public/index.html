@@ -9,28 +9,24 @@
 <body>
     <div class="form-container">
         <form id="site-form" onsubmit="sendData(event)" method="POST">
-
             <div class="site-url-container">
-                <input type="text" name="url" placeholder="type a url">
+                <input type="text" name="url" placeholder="Type a url">
             </div>
 
             <div class="options-container">
                 <select name="standard">
-                    <option value="Section508">Section508</option>
-                    <option value="WCAG2A">WCAG2A</option>
-                    <option value="WCAG2AA">WCAG2AA</option>
+                    <option value="" selected disabled hidden>Choose a standard</option>
                     <option value="WCAG2AAA">WCAG2AAA</option>
+                    <option value="WCAG2AA">WCAG2AA</option>
+                    <option value="WCAG2A">WCAG2A</option>
+                    <option value="Section508">Section508</option>
                 </select>
-                <input type="numeric" name="wait" value="8000">
+                <input type="numeric" name="wait" placeholder="Type wait time in ms" />
             </div>
+            <button type="submit" form="site-form" id="submit-button">CHECK</button>
         </form>
-        <button type="submit" form="site-form" id="submit-button">CHECK</button>
-
-        <div class="result-container">
-           <iframe class="report-container"></iframe>
-        </div>
-
     </div>
+    <div class="result-container"></div>
 </body>
 
 </html>

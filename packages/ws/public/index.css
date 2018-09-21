@@ -1,46 +1,78 @@
+* {
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+html,
+body,
+input,
+select,
+button {
+    margin: 0;
+    padding: 0;
+    font-size: 1em;
+}
+
 .form-container {
-    background-color: grey;
+    display: flex;
+    padding: 1.5rem;
+    width: 100%;
 }
 
-.screenshot {
-    display: block;
-    max-width: 100%;
+#site-form {
+    width: 100%;
 }
 
-.screenshot-container {
-    display: block;
-    max-height: 500px;
-    margin: 2em auto;
-    overflow: scroll;
-    border: solid #d5d5d5;
-    border-width: 30px 4px 4px;
-    border-radius: 4px;
+.form-container input {
+    height: 2.5rem;
+    border: none;
+    border-bottom: 1px solid black;
+    outline: none;
 }
 
-.buttons-container {
-    position: absolute;
-    margin-top: -24px;
-    margin-left: 5px;
+.site-url-container,
+.options-container {
+    margin-bottom: 1.5rem;
 }
 
-.button-osx {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 10px;
+.site-url-container input {
+    width: 100%;
 }
 
-.close {
-    background: #ff5c5c;
-    border: 1px solid #e33e41;
+.form-container select {
+    height: 2.5rem;
+    -webkit-appearance: none;
+    border: none;
+    border-bottom: 1px solid black;
+    border-radius: 0px;
+    outline: none;
+    width: 33%;
+    background-color: white;
+    cursor: pointer;
+    margin-right: 1.5rem;
+    color: grey;
 }
 
-.minimize {
-    background: #ffbd4c;
-    border: 1px solid #e09e3e;
+.options-container input {
+    width: 33%;
 }
 
-.zoom {
-    background: #00ca56;
-    border: 1px solid #14ae46;
+input:focus {
+    border-bottom-width: 3px;
+    transition: all ease 0.3s;
+}
+
+.form-container #submit-button {
+    height: 2.5rem;
+    outline: none;
+    border: none;
+    border-radius: 0px;
+    background-color: rgba(0, 0, 0, 0.05);
+    color: black;
+    width: 33%;
+}
+
+.result-container {
+    padding: 1.5rem;
+    width: 100%;
 }

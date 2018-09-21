@@ -11,10 +11,10 @@
   "license": "MIT",
   "dependencies": {
     "@chialab/chia11y-config": "^1.0.0",
+    "@chialab/pa11y-reporter-html": "^1.0.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "lodash": "^4.17.11",
-    "pa11y": "github:edoardocavazza/pa11y",
-    "@chialab/pa11y-reporter-html": "^1.0.0"
+    "pa11y": "github:edoardocavazza/pa11y"
   }
 }
