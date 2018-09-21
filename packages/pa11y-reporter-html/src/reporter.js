@@ -1,5 +1,4 @@
-import compile from 'lodash/template';
-import templateString from './reporter.tpl';
+import template from './reporter.tpl';
 import templateCSS from './reporter.css';
 
 const report = {};
@@ -9,7 +8,6 @@ report.supports = '^5.0.0 || ^5.0.0-alpha || ^5.0.0-beta';
 
 // Compile template and output formatted results
 report.results = async results => {
-    const template = compile(templateString);
     return template({
 
         css: templateCSS,
@@ -19,10 +17,7 @@ report.results = async results => {
 
         // Result information
         documentTitle: results.documentTitle,
-        issues: results.issues.map(issue => {
-            issue.typeLabel = upperCaseFirst(issue.type);
-            return issue;
-        }),
+        issues: results.issues,
         pageUrl: results.pageUrl,
 
         // Issue counts

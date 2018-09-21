@@ -1,3 +1,4 @@
+import Reporter from '@chialab/pa11y-reporter-html';
 import HTMLCS_SCRIPT from 'pa11y/lib/vendor/HTMLCS';
 import RUNNER_SCRIPT from 'pa11y/lib/runner';
 
@@ -22,34 +23,41 @@ async function run() {
         loaded = true;
     }
 
+    const RESULT_VARIABLE = `pa11y_results_${Date.now()}`;
 
-    let res = await inject(`
-        var res;
+    let report = await inject(`
+        var ${RESULT_VARIABLE} = { result: null, error: null };
         (async () => {
-            res = await _runPa11y({
-                hideElements: null,
-                ignore: [],
-                rootElement: null,
-                rules: [],
-                standard: 'WCAG2AA',
-                wait: 0,
-            });
+            try {
+                ${RESULT_VARIABLE}.result = await _runPa11y({
+                    hideElements: null,
+                    ignore: [],
+                    rootElement: null,
+                    rules: [],
+                    standard: 'WCAG2AA',
+                    wait: 0,
+                });
+            } catch (error) {
+                ${RESULT_VARIABLE}.error = error.mesage;
+            }
         })();
-        res;
     `);
 
-    while (!res) {
-        res = await inject('res');
+    while (!report.result && !report.error) {
+        report = await inject(RESULT_VARIABLE);
     }
-    console.log(res);
+
+    if (report.result) {
+        let html = await Reporter.results(report.result);
+        await render(html);
+    }
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log(request, sender, sendResponse)
-    if (request.pa11y) {
-        console.log(request.pa11y);
-    }
-});
+async function render(html) {
+    let body = html.match(/<body[^>]*>((?:.|\s)*)<\/body>/im)[1];
+    let frame = document.getElementById('report');
+    frame.innerHTML = body;
+}
 
 window.addEventListener('load', () => {
     document.getElementById('run').addEventListener('click', run);

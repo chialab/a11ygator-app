@@ -1,7 +1,15 @@
 html, body {
+    width: 100%;
+    height: 100%;
     margin: 0;
     padding: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px !important;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
 }
 
 *,
@@ -12,6 +20,7 @@ html, body {
 
 .toolbar {
     display: flex;
+    flex: none;
     align-content: center;
     align-items: center;
     flex-direction: row;
@@ -29,31 +38,8 @@ html, body {
     margin-left: auto;
 }
 
-select {
-    padding: 0.25rem 2rem;
-    font-family: inherit;
-    font-size: inherit;
-    background: #fff;
-    border: solid 2px currentColor;
-    border-radius: 2px;
-    appearance: none;
-}
-
-button {
-    padding: 0.25rem 2rem;
-    font-size: 1em;
-    color: #000;
-    background: #fff;
-    border: solid 2px currentColor;
-    font-family: inherit;
-    font-size: inherit;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: background 150ms ease-out;
-}
-
-button:hover,
-button:focus {
-    background: #f2f2f2;
-    outline: 0;
+#report {
+    flex: 1 auto;
+    overflow: auto;
+    border: 0;
 }
