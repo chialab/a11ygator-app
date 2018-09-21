@@ -18,7 +18,6 @@ app.all('/', async function (req, res) {
         delete options.url;
     }
     const result = await chia11y(url, options);
-    console.log(result)
     res.send(result)
 });
 

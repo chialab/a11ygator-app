@@ -14,9 +14,6 @@ sendData = async function (ev) {
 
     document.querySelector('.result-container').innerHTML = 'Loading';
 
-    const res = await fetch(`${document.location.origin}/?url=${url}`);
-    res.json()
-        .then((json) => {
-            document.querySelector('.result-container').innerHTML = JSON.stringify(json);
-        })
+    const htmlRes = await fetch(`${document.location.origin}/?url=${url}`);
+    document.querySelector('.report-container').srcDoc = htmlRes;
 }
