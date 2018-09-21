@@ -54,9 +54,24 @@ async function run() {
 }
 
 async function render(html) {
-    let body = html.match(/<body[^>]*>((?:.|\s)*)<\/body>/im)[1];
     let frame = document.getElementById('report');
-    frame.innerHTML = body;
+    let parser = new DOMParser();
+    let doc = parser.parseFromString(html, 'text/html');
+    frame.innerHTML = doc.body.innerHTML;
+    frame.querySelectorAll('.results-list .result').forEach((li) => {
+        let button = document.createElement('button');
+        button.textContent = 'inspect';
+        button.classList.add('inspect-button');
+        li.querySelector('pre').appendChild(button);
+        button.addEventListener('click', async (ev) => {
+            ev.preventDefault();
+            await highlight(li.getAttribute('data-selector'));
+        });
+    });
+}
+
+async function highlight(selector) {
+    console.log(await inject(`inspect($('${selector}'))`));
 }
 
 window.addEventListener('load', () => {

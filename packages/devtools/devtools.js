@@ -1,3 +1,3 @@
-chrome.devtools.panels.create('Chia11y', null, 'panel/panel.html', (panel) => {
+chrome.devtools.panels.create('Pa11y', 'icon.png', 'panel/panel.html', (panel) => {
     // code invoked on panel creation
 });

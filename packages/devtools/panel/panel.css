@@ -43,3 +43,8 @@ body {
     overflow: auto;
     border: 0;
 }
+
+.inspect-button {
+    margin-top: 0.5rem;
+    cursor: pointer;
+}

@@ -8,57 +8,58 @@
 </head>
 <body>
 
-	<style><%= data.css %></style>
+	<div class="pa11y-report">
+		<style><%= data.css %></style>
 
-	<div class="page">
+		<div class="pa11y-page">
 
-		<h1>Accessibility report for <a href="<%= data.pageUrl %>" target="_blank"><%= data.documentTitle %></a></h1>
+			<h1>Accessibility report for <a href="<%= data.pageUrl %>" target="_blank"><%= data.documentTitle %></a></h1>
 
-		<% if (data.screenPath) { %>
-		<div class='screenshot-container'>
-			<div class="buttons-container">
-				<div class="button-osx close"></div>
-				<div class="button-osx minimize"></div>
-				<div class="button-osx zoom"></div>
+			<% if (data.screenPath) { %>
+			<div class='screenshot-container'>
+				<div class="buttons-container">
+					<div class="button-osx close"></div>
+					<div class="button-osx minimize"></div>
+					<div class="button-osx zoom"></div>
+				</div>
+				<img class="screenshot" src="<%= data.screenPath %>"/>
 			</div>
-			<img class="screenshot" src="<%= data.screenPath %>"/>
+			<% } %>
+
+			<form>
+				<input type="radio" id="radio-all" value="all" name="filter" checked />
+				<label for="radio-all" class="all">All</label>
+				<input type="radio" id="radio-errors" value="errors" name="filter" />
+				<label for="radio-errors" class="count-error">errors (<%= data.errorCount %>)</label>
+				<input type="radio" id="radio-warnings" value="warnings" name="filter" />
+				<label for="radio-warnings" class="count-warning">warnings (<%= data.warningCount %>)</label>
+				<input type="radio" id="radio-notices" value="notices" name="filter" />
+				<label for="radio-notices" class="count-notice">notices (<%= data.noticeCount %>)</label>
+
+				<output>
+					<ul class="clean-list results-list">
+						<%
+						let issues = data.issues.slice(0);
+						issues.sort((issue1, issue2) => parseFloat(issue1.typeCode) - parseFloat(issue2.typeCode));
+						for (let i = 0; i < issues.length; i++) { 
+							let issue = issues[i]; %>
+						<li class="result <%= issue.type %>" data-selector="<%= issue.selector %>">
+							<h2><%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
+							<p><%= issue.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></p>
+							<pre><code><%= issue.context.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></code></pre>
+						</li>
+						<% } %>
+					</ul>
+				</output>
+			</form>
+
+			<hr />
+
+			<footer>
+				<p>Generated at: <%= data.date.toLocaleString() %></p>
+				<p>Powered by <a href="http://pa11y.org/" target="_blank"><img src="http://pa11y.org/resources/brand/logo.svg" alt="Pa11y logo" />Pa11y</a</p>
+			</footer>
 		</div>
-		<% } %>
-
-		<form>
-			<input type="radio" id="radio-all" value="all" name="filter" checked />
-			<label for="radio-all" class="all">All</label>
-			<input type="radio" id="radio-errors" value="errors" name="filter" />
-			<label for="radio-errors" class="count-error">errors (<%= data.errorCount %>)</label>
-			<input type="radio" id="radio-warnings" value="warnings" name="filter" />
-			<label for="radio-warnings" class="count-warning">warnings (<%= data.warningCount %>)</label>
-			<input type="radio" id="radio-notices" value="notices" name="filter" />
-			<label for="radio-notices" class="count-notice">notices (<%= data.noticeCount %>)</label>
-
-			<output>
-				<ul class="clean-list results-list">
-					<%
-					let issues = data.issues.slice(0);
-					issues.sort((issue1, issue2) => parseFloat(issue1.typeCode) - parseFloat(issue2.typeCode));
-					for (let i = 0; i < issues.length; i++) { 
-						let issue = issues[i]; %>
-					<li class="result <%= issue.type %>" data-selector="<%= issue.selector %>">
-						<h2><%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
-						<p><%= issue.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></p>
-						<pre><code><%= issue.context.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></code></pre>
-					</li>
-					<% } %>
-				</ul>
-			</output>
-		</form>
-
-		<hr />
-
-		<footer>
-			<p>Generated at: <%= data.date.toLocaleString() %></p>
-			<p>Powered by <a href="http://pa11y.org/" target="_blank"><img src="http://pa11y.org/resources/brand/logo.svg" alt="Pa11y logo" />Pa11y</a</p>
-		</footer>
 	</div>
-
 </body>
 </html>
