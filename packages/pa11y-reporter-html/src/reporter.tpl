@@ -12,12 +12,13 @@
 
 	<div class="page">
 
-		<h1>Accessibility Report For "<%= data.documentTitle %>"</h1>
+		<h1>Accessibility report for "<%= data.documentTitle %>"</h1>
 
 		<p class="counts">
-			<span class="count error"><%= data.errorCount %> errors</span>
-			<span class="count warning"><%= data.warningCount %> warnings</span>
-			<span class="count notice"><%= data.noticeCount %> notices</span>
+			<button class="count all">All</button>
+			<button class="count count-error">errors (<%= data.errorCount %>)</button>
+			<button class="count count-warning">warnings (<%= data.warningCount %>)</button>
+			<button class="count count-notice">notices (<%= data.noticeCount %>)</button>
 		</p>
 
 		<ul class="clean-list results-list">
@@ -27,7 +28,7 @@
 			for (let i = 0; i < issues.length; i++) { 
 				let issue = issues[i]; %>
 			<li class="result <%= issue.type %>" data-selector="<%= issue.selector %>">
-				<h2><%= issue.type %>: <%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
+				<h2><%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
 				<p><%= issue.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></p>
 				<pre><%= issue.context.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></pre>
 			</li>

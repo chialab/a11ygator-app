@@ -45,13 +45,45 @@ hr {
 }
 
 .counts {
+    display: flex;
+    flex-direction: row;
     margin-top: 30px;
 }
 
-.count {
-    display: inline-block;
+.counts button {
     padding: 1rem;
+    font-size: 1em;
     line-height: 1em;
+    text-transform: uppercase;
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 150ms ease-out;
+    outline: 0;
+}
+
+.counts button:focus,
+.counts button:hover {
+    background: rgba(0,0,0,0.05);
+    transition: none;
+}
+
+.counts button:active {
+    background: rgba(0,0,0,0.1);
+    transition: none;
+}
+
+.count-error {
+    color: #ff0000;
+}
+
+.count-warning {
+    color: #ffae00;
+}
+
+.count-notice {
+    color: #00b6ff;
 }
 
 .clean-list {
@@ -69,13 +101,13 @@ hr {
 }
 
 .error {
-    background-color: #fdd;
+    border-left: solid 3px #ff0000;
 }
 
 .warning {
-    background-color: #ffd;
+    border-left: solid 3px #ffae00;
 }
 
 .notice {
-    background-color: #eef4ff;
+    border-left: solid 3px #00b6ff;
 }
