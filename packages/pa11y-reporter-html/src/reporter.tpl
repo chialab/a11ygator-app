@@ -12,32 +12,52 @@
 
 	<div class="page">
 
-		<h1>Accessibility report for "<%= data.documentTitle %>"</h1>
+		<h1>Accessibility report for <a href="<%= data.pageUrl %>" target="_blank"><%= data.documentTitle %></a></h1>
 
-		<p class="counts">
-			<button class="count all">All</button>
-			<button class="count count-error">errors (<%= data.errorCount %>)</button>
-			<button class="count count-warning">warnings (<%= data.warningCount %>)</button>
-			<button class="count count-notice">notices (<%= data.noticeCount %>)</button>
-		</p>
+		<% if (data.screenPath) { %>
+		<div class='screenshot-container'>
+			<div class="buttons-container">
+				<div class="button-osx close"></div>
+				<div class="button-osx minimize"></div>
+				<div class="button-osx zoom"></div>
+			</div>
+			<img class="screenshot" src="<%= data.screenPath %>"/>
+		</div>
+		<% } %>
 
-		<ul class="clean-list results-list">
-			<%
-			let issues = data.issues.slice(0);
-			issues.sort((issue1, issue2) => parseFloat(issue1.typeCode) - parseFloat(issue2.typeCode));
-			for (let i = 0; i < issues.length; i++) { 
-				let issue = issues[i]; %>
-			<li class="result <%= issue.type %>" data-selector="<%= issue.selector %>">
-				<h2><%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
-				<p><%= issue.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></p>
-				<pre><%= issue.context.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></pre>
-			</li>
-			<% } %>
-		</ul>
+		<form>
+			<input type="radio" id="radio-all" value="all" name="filter" checked />
+			<label for="radio-all" class="all">All</label>
+			<input type="radio" id="radio-errors" value="errors" name="filter" />
+			<label for="radio-errors" class="count-error">errors (<%= data.errorCount %>)</label>
+			<input type="radio" id="radio-warnings" value="warnings" name="filter" />
+			<label for="radio-warnings" class="count-warning">warnings (<%= data.warningCount %>)</label>
+			<input type="radio" id="radio-notices" value="notices" name="filter" />
+			<label for="radio-notices" class="count-notice">notices (<%= data.noticeCount %>)</label>
+
+			<output>
+				<ul class="clean-list results-list">
+					<%
+					let issues = data.issues.slice(0);
+					issues.sort((issue1, issue2) => parseFloat(issue1.typeCode) - parseFloat(issue2.typeCode));
+					for (let i = 0; i < issues.length; i++) { 
+						let issue = issues[i]; %>
+					<li class="result <%= issue.type %>" data-selector="<%= issue.selector %>">
+						<h2><%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
+						<p><%= issue.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></p>
+						<pre><code><%= issue.context.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></code></pre>
+					</li>
+					<% } %>
+				</ul>
+			</output>
+		</form>
 
 		<hr />
 
-		<p>Generated at: <%= data.date.toLocaleString() %></p>
+		<footer>
+			<p>Generated at: <%= data.date.toLocaleString() %></p>
+			<p>Powered by <a href="http://pa11y.org/" target="_blank"><img src="http://pa11y.org/resources/brand/logo.svg" alt="Pa11y logo" />Pa11y</a</p>
+		</footer>
 	</div>
 
 </body>

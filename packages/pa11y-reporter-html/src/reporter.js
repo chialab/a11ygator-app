@@ -19,6 +19,7 @@ report.results = async results => {
         documentTitle: results.documentTitle,
         issues: results.issues,
         pageUrl: results.pageUrl,
+        screenPath: results.screenPath,
 
         // Issue counts
         errorCount: results.issues.filter(issue => issue.type === 'error').length,

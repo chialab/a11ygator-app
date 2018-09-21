@@ -10,25 +10,46 @@ body {
 }
 
 li {
-    margin-bottom: 15px;
+    margin-bottom: 2rem;
 }
 
-h1, h2, p, pre, ul {
+h1,
+h2,
+p,
+pre,
+ul {
     margin-top: 0;
     margin-bottom: 0;
 }
 
 h1 {
-    margin-bottom: 10px;
-    font-size: 24px;
-    line-height: 24px;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+    line-height: 1em;
+    font-weight: normal;
+}
+
+h1 a {
+    color: #008cff;
+    display: inline-block;
+    text-decoration: none;
 }
 
 h2 {
-    font-size: 16px;
+    font-size: 1rem;
+    line-height: 1.4em;
 }
 
 pre {
+    padding: 1rem;
+    margin-top: 1rem;
+    background: #f5f5f5;
+    border-radius: 2px;
+}
+
+code {
+    display: block;
+    width: 100%;
     white-space: pre-wrap;
     overflow: auto;
 }
@@ -38,40 +59,93 @@ hr {
     border-width: 2px 0 0 0;
 }
 
+footer {
+    display: flex;
+    flex-direction: row;
+    color: #999;
+}
+
+footer > *:first-child {
+    flex: 1 auto;
+}
+
+footer a {
+    color: #000;
+    text-decoration: none;
+}
+
+footer a img {
+    height: 2em;
+    margin: 0 0.5em 0 0.75em;
+    vertical-align: middle;
+}
+
 .page {
     max-width: 800px;
-    margin: 0 auto;
     padding: 2rem 1rem;
 }
 
-.counts {
+form {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     margin-top: 30px;
 }
 
-.counts button {
+form label {
+    position: relative;
     padding: 1rem;
     font-size: 1em;
     line-height: 1em;
     text-transform: uppercase;
     background: transparent;
     border: 0;
-    border-radius: 4px;
+    border-radius: 0;
     cursor: pointer;
     transition: background 150ms ease-out;
     outline: 0;
+    border-top: solid 2px transparent;
+    border-bottom: solid 2px transparent;
 }
 
-.counts button:focus,
-.counts button:hover {
-    background: rgba(0,0,0,0.05);
+form input {
+    display: none;
+}
+
+form input:checked + label {
+    border-bottom-color: currentColor;
+}
+
+form label:focus,
+form label:hover {
+    background: rgba(0, 0, 0, 0.05);
     transition: none;
 }
 
-.counts button:active {
-    background: rgba(0,0,0,0.1);
+form label:active {
+    background: rgba(0, 0, 0, 0.1);
     transition: none;
+}
+
+form output {
+    flex: none;
+    width: 100%;
+}
+
+form input:not([value="all"]):checked ~ output li {
+    display: none;
+}
+
+form input[value="errors"]:checked ~ output li.error {
+    display: block;
+}
+
+form input[value="warnings"]:checked ~ output li.warning {
+    display: block;
+}
+
+form input[value="notices"]:checked ~ output li.notice {
+    display: block;
 }
 
 .count-error {
@@ -110,4 +184,47 @@ hr {
 
 .notice {
     border-left: solid 3px #00b6ff;
+}
+
+.screenshot {
+    max-width: 100%;
+    display: block;
+}
+
+.screenshot-container {
+    border: solid #d5d5d5;
+    border-width: 30px 4px 4px;
+    border-radius: 4px;
+    overflow: scroll;
+    max-height: 500px;
+    margin: 2em auto;
+    display: block;
+}
+
+.buttons-container {
+    position: absolute;
+    margin-top: -24px;
+    margin-left: 5px;
+}
+
+.button-osx {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    border-radius: 10px;
+}
+
+.close {
+    background: #ff5c5c;
+    border: 1px solid #e33e41;
+}
+
+.minimize {
+    background: #ffbd4c;
+    border: 1px solid #e09e3e;
+}
+
+.zoom {
+    background: #00ca56;
+    border: 1px solid #14ae46;
 }
