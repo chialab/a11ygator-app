@@ -1,7 +1,7 @@
 {
-  "name": "@chialab/chia11y-config",
+  "name": "@chialab/chia11y-devtools",
   "version": "1.0.0",
-  "description": "A base config for chia11y.",
+  "description": "A Chrome devtool implementation of Chia11y.",
   "main": "index.js",
   "repository": {
     "type": "git",
