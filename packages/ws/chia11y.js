@@ -2,7 +2,6 @@ const pa11y = require('pa11y');
 const config = require('@chialab/chia11y-config');
 const _ = require('lodash');
 const htmlReporter = require('@chialab/pa11y-reporter-html');
-const DomParser = require('dom-parser');
 
 module.exports = chia11y;
 

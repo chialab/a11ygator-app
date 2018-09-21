@@ -16,7 +16,7 @@
 			<h1>Accessibility report for <a href="<%= data.pageUrl %>" target="_blank"><%= data.documentTitle %></a></h1>
 
 			<% if (data.screenPath) { %>
-			<div class='screenshot-container'>
+			<div class="screenshot-container">
 				<div class="buttons-container">
 					<div class="button-osx close"></div>
 					<div class="button-osx minimize"></div>

@@ -11,15 +11,19 @@ sendData = async function (ev) {
     const options = data;
     const url = data.url;
     delete options.url;
-
+    
     const resultContainer = document.querySelector('.result-container');
-    resultContainer.innerHTML = 'Loading';
+    
+    if (!url) {
+        resultContainer.innerHTML = `<div class="url-error">Please insert an url to check.</div>`;
+        return;
+    }
+
+    resultContainer.innerHTML = `<div class="loader"></div>`;
 
     const htmlRes = await fetch(`${document.location.origin}/?url=${url}`).then((res) => res.text());
-    console.log(htmlRes)
     const parser = new DOMParser();
     const htmlDocument = parser.parseFromString(htmlRes, "text/html");
-    console.log(htmlDocument)
     const reportElement = htmlDocument.querySelector('.pa11y-report');
     resultContainer.innerHTML = reportElement.outerHTML;
 }
