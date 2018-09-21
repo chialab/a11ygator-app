@@ -1,12 +1,12 @@
 {
-    "name": "@chialab/chia11y-config",
-    "version": "1.0.0",
-    "description": "A base config for chia11y.",
-    "main": "index.js",
-    "repository": {
-      "type": "git",
-      "url": "git@gitlab.com:chialab/chia11y.git"
-    },
-    "author": "Chialab",
-    "license": "MIT"
-  }
+  "name": "@chialab/chia11y-config",
+  "version": "1.0.0",
+  "description": "A base config for chia11y.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.com:chialab/chia11y.git"
+  },
+  "author": "Chialab",
+  "license": "MIT"
+}

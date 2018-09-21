@@ -1,19 +1,19 @@
-# chia11y
+# Chia11y
 
 A web dashboard for accessibility tests results.
 
 ## Start the server
 
 ```.sh
-npm install
-npm start
+yarn install
+yarn start
 ```
 
 ## Usage
 
 In local environment, navigate with the browser to
 
-```.sh
+```
 https://localhost:9000?url=<site-to-test>
 ```
 
