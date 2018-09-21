@@ -1,68 +1,81 @@
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     background-color: #fff;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 22px;
     color: #333;
 }
+
 li {
     margin-bottom: 15px;
 }
+
 h1, h2, p, pre, ul {
     margin-top: 0;
     margin-bottom: 0;
 }
+
 h1 {
     margin-bottom: 10px;
     font-size: 24px;
     line-height: 24px;
 }
+
 h2 {
     font-size: 16px;
 }
+
 pre {
     white-space: pre-wrap;
     overflow: auto;
 }
+
+hr {
+    border: solid 2px #e5e5e5;
+    border-width: 2px 0 0 0;
+}
+
 .page {
     max-width: 800px;
     margin: 0 auto;
-    padding: 25px;
+    padding: 2rem 1rem;
 }
+
 .counts {
     margin-top: 30px;
-    font-size: 20px;
 }
+
 .count {
     display: inline-block;
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid #eee;
+    padding: 1rem;
+    line-height: 1em;
 }
+
 .clean-list {
     margin-left: 0;
     padding-left: 0;
     list-style: none;
 }
+
 .results-list {
-    margin-top: 30px;
+    margin-top: 2rem;
 }
+
 .result {
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #eee;
+    padding: 1rem;
 }
+
 .error {
     background-color: #fdd;
-    border-color: #ff9696;
 }
+
 .warning {
     background-color: #ffd;
-    border-color: #e7c12b;
 }
+
 .notice {
     background-color: #eef4ff;
-    border-color: #b6d0ff;
 }
