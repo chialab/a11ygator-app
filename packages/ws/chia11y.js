@@ -32,7 +32,8 @@ async function chia11y(url, options) {
         })
         .catch((err) => {
             console.error('Failed to execute pa11y', err);
-            return Promise.reject(err);
+            err.error = 'Please insert a valid url.';
+            return Promise.resolve(err);
         })
 }
 
