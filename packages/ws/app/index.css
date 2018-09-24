@@ -57,6 +57,7 @@ header a {
 
 .form-container label {
     margin-right: 0.5rem;
+    white-space: nowrap;
 }
 
 .form-container label + input,
@@ -72,6 +73,10 @@ header a {
     justify-content: flex-start;
     width: 100%;
     margin-bottom: 1.5rem;
+}
+
+.options-container {
+    flex-wrap: wrap;
 }
 
 .site-url-container input {

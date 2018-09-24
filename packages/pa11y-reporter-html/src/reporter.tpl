@@ -30,11 +30,11 @@
 				<input type="radio" id="radio-all" value="all" name="filter" checked />
 				<label for="radio-all" class="all">All</label>
 				<input type="radio" id="radio-errors" value="errors" name="filter" />
-				<label for="radio-errors" class="count-error">errors (<%= data.errorCount %>)</label>
+				<label for="radio-errors" class="count-error">Errors (<%= data.errorCount %>)</label>
 				<input type="radio" id="radio-warnings" value="warnings" name="filter" />
-				<label for="radio-warnings" class="count-warning">warnings (<%= data.warningCount %>)</label>
+				<label for="radio-warnings" class="count-warning">Warnings (<%= data.warningCount %>)</label>
 				<input type="radio" id="radio-notices" value="notices" name="filter" />
-				<label for="radio-notices" class="count-notice">notices (<%= data.noticeCount %>)</label>
+				<label for="radio-notices" class="count-notice">Notices (<%= data.noticeCount %>)</label>
 
 				<output>
 					<ul class="clean-list results-list">

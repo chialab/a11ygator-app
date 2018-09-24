@@ -19,25 +19,22 @@ sendData = async function (ev) {
     resultContainer.innerHTML = `<div class="loader"></div>`;
 
     fetch(`${document.location.origin}/?url=${url}`)
-        .then(async (res) => {
-            let htmlRes = await res.text();
-
-            if (typeof htmlRes === 'string') {
-                try {
-                    htmlRes = JSON.parse(htmlRes);
-                } catch(err) {
-                    console.error(`Can't parse in HTML`);
-                }
+        .then((res) => {
+            if (res.ok) {
+                return res.text()
+                    .then((htmlRes) => {
+                        const parser = new DOMParser();
+                        const htmlDocument = parser.parseFromString(htmlRes, "text/html");
+                        const reportElement = htmlDocument.querySelector('.pa11y-report');
+                        resultContainer.innerHTML = reportElement.outerHTML;
+                    })
             }
-
-            if (htmlRes.error) {
-                resultContainer.innerHTML = missingUrlErrorMessage(htmlRes.error);
-                return;
-            }
-
-            const parser = new DOMParser();
-            const htmlDocument = parser.parseFromString(htmlRes, "text/html");
-            const reportElement = htmlDocument.querySelector('.pa11y-report');
-            resultContainer.innerHTML = reportElement.outerHTML;
+            return res.json()
+                .then((jsonRes) => {
+                    if (htmlRes.error) {
+                        resultContainer.innerHTML = missingUrlErrorMessage(jsonRes.error);
+                        return;
+                    }
+                });
         });
 }
