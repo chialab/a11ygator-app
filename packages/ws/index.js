@@ -5,7 +5,7 @@ const app = express()
 const PORT = process.env.PORT || 9000;
 
 app.use('/screenshots', express.static(__dirname + '/screenshots'));
-app.use('/app', express.static(__dirname));
+app.use('/app', express.static(__dirname + '/app'));
 
 app.all('/', async function (req, res) {
     const url = req.query && req.query.url;
@@ -20,8 +20,6 @@ app.all('/', async function (req, res) {
     return chia11y(url, options).then((result) => res.send(result));
 });
 
-app.get('/app', (req, res) => {
-    res.sendFile('public/index.html', { root : __dirname});
+app.listen(PORT, '127.0.0.1', () => {
+    console.log(`Pa11y dashboard listening on http://127.0.0.1:${PORT}`);
 });
-
-app.listen(PORT);
