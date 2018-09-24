@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en-GB">
 
 <head>
+    <meta charset="utf-8">
     <title>Pa11y validator</title>
+    <meta name="viewport" content="width=device-width">
     <script type="text/javascript" src="index.js"></script>
     <link rel="stylesheet" href="index.css">
+    <link rel="icon" type="image/png" href="http://pa11y.org/resources/brand/favicon/favicon-196x196.png">
 </head>
 
 <body>
@@ -27,13 +30,13 @@
             <div class="options-container">
                 <label for="standard">Standard:</label>
                 <select name="standard" id="standard">
-                    <option value="WCAG2AAA">WCAG2AAA</option>
-                    <option value="WCAG2AA" selected>WCAG2AA</option>
                     <option value="WCAG2A">WCAG2A</option>
+                    <option value="WCAG2AA" selected>WCAG2AA</option>
+                    <option value="WCAG2AAA">WCAG2AAA</option>
                     <option value="Section508">Section508</option>
                 </select>
                 <label for="wait">Wait time (ms):</label>
-                <input type="number" min="0" step="1" size="3" max="10000" id="wait" name="wait" />
+                <input type="number" min="0" value="0" step="1" size="3" max="10000" id="wait" name="wait" />
             </div>
         </form>
     </div>
