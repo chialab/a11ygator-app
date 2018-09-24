@@ -20,6 +20,6 @@ app.all('/', async function (req, res) {
     return chia11y(url, options).then((result) => res.send(result));
 });
 
-app.listen(PORT, '127.0.0.1', () => {
-    console.log(`Pa11y dashboard listening on http://127.0.0.1:${PORT}`);
+app.listen(PORT, () => {
+    console.log(`Pa11y dashboard listening on http://localhost:${PORT}`);
 });
