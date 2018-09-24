@@ -101,11 +101,11 @@ select:focus {
 }
 
 .loader {
-    border: 12px solid #f3f3f3;
-    border-top: 12px solid grey;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid grey;
     border-radius: 50%;
-    width: 60px;
-    height: 60px;
+    width: 75px;
+    height: 75px;
     animation: spin 1s linear infinite;
     margin: auto;
     margin-top: 3rem;
