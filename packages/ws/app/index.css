@@ -1,50 +1,83 @@
-* {
-    box-sizing: border-box;
-    font-family: sans-serif;
-}
-
 html,
-body,
-input,
-select,
-button {
+body {
     margin: 0;
     padding: 0;
-    font-size: 1em;
+    font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
 }
 
-/* Remove Chrome autofill yellow background ;) */
-input:-webkit-autofill {
-    box-shadow: 0 0 0px 1000px white inset;
-    -webkit-box-shadow: 0 0 0px 1000px white inset;
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
-.form-container {
-    display: flex;
-    padding: 1.5rem;
-    width: 100%;
+header .site-brand__logo {
+    display: inline-block;
+    vertical-align: middle;
 }
 
-#site-form {
-    width: auto;
+header a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.container {
+    width: 800px;
+    max-width: 100%;
+    padding: 1rem;
     margin: auto;
 }
 
-.form-container input {
+.form-container form {
+    max-width: 100%;
+}
+
+.form-container input,
+.form-container select {
     height: 2.5rem;
     border: none;
     border-bottom: 1px solid black;
+    font-size: 1em;
     outline: none;
     transition: box-shadow .4s, -webkit-box-shadow .4s, border .4s;
 }
 
+.form-container input::placeholder {
+    color: #ccc;
+}
+
+.form-container input:-ms-input-placeholder {
+    color: #ccc;
+}
+
+.form-container input::-ms-input-placeholder {
+    color: #ccc;
+}
+
+.form-container label {
+    margin-right: 0.5rem;
+}
+
+.form-container label + input,
+.form-container label + select {
+    margin-right: 2rem;
+}
+
 .site-url-container,
 .options-container {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-start;
+    width: 100%;
     margin-bottom: 1.5rem;
 }
 
 .site-url-container input {
-    width: 61.5rem;
+    width: 100%;
+    margin-right: 1rem;
+    font-size: 1.4em;
 }
 
 .form-container select {
@@ -54,19 +87,9 @@ input:-webkit-autofill {
     border-bottom: 1px solid black;
     border-radius: 0px;
     outline: none;
-    width: 30rem;
     background-color: white;
     cursor: pointer;
-    margin-right: 1.5rem;
     transition: box-shadow .4s, -webkit-box-shadow .4s, border .4s;
-}
-
-/* .options-container::after {
-    content: '\0025BE';
-} */
-
-input[name="wait"] {
-    width: 30rem;
 }
 
 input:focus,
@@ -77,32 +100,45 @@ select:focus {
     box-shadow: 0 1px 0 0 black;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: currentColor;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* check button */
-.form-container #submit-button {
+.form-container button {
     height: 2.5rem;
     outline: none;
-    border: none;
-    border-radius: 0px;
-    background-color: rgba(0, 0, 0, 0.05);
-    color: black;
-    width: 30rem;
+    border: 0;
+    border-radius: 2px;
+    background-color: #3498DB;
+    color: #fff;
+    width: 8rem;
+    font-size: 1em;
+    max-width: 1000%;
     cursor: pointer;
     transition: all 150ms ease-out;
 }
 
-.form-container #submit-button:hover {
-    background-color: rgba(0, 0, 0, 0.10);
-    transition: none;
+.form-container button:hover {
+    background-color: #2282c3;
 }
 
-.result-container {
-    padding: 1.5rem;
-    width: 100%;
+.form-container button:active {
+    background-color: #1e74ad;
 }
 
 .loader {
     border: 8px solid #f3f3f3;
-    border-top: 8px solid grey;
+    border-top: 8px solid #3498DB;
     border-radius: 50%;
     width: 75px;
     height: 75px;
@@ -121,11 +157,30 @@ select:focus {
     }
 }
 
-.pa11y-page {
+.result-container {
+    display: block;
+    position: relative;
+    margin-top: 2rem;
+    padding-top: 4rem;
+}
+
+.result-container::before {
+    position: absolute;
+    top: 0;
+    left: -50vw;
+    right: -50vw;
+    display: block;
+    content: '';
+    border-top: dotted 4px #ccc;
+    width: 100vw;
     margin: auto;
 }
 
-.error {
+.result-container .pa11y-report .pa11y-page {
+    padding: 0;
     margin: auto;
-    width: 61.5rem;
+}
+
+.result-container .pa11y-report .pa11y-page footer .credits {
+    display: none;
 }

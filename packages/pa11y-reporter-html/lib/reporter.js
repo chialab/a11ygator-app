@@ -15,7 +15,7 @@
 	'" target="_blank">' +
 	((__t = ( data.documentTitle )) == null ? '' : __t) +
 	'</a></h1>\n\n			';
-	 if (data.screenPath) {__p += '\n			<div class=\'screenshot-container\'>\n				<div class="buttons-container">\n					<div class="button-osx close"></div>\n					<div class="button-osx minimize"></div>\n					<div class="button-osx zoom"></div>\n				</div>\n				<img class="screenshot" src="' +
+	 if (data.screenPath) {__p += '\n			<div class="screenshot-container">\n				<div class="buttons-container">\n					<div class="button-osx close"></div>\n					<div class="button-osx minimize"></div>\n					<div class="button-osx zoom"></div>\n				</div>\n				<img class="screenshot" src="' +
 	((__t = ( data.screenPath )) == null ? '' : __t) +
 	'"/>\n			</div>\n			';
 	 }__p += '\n\n			<form>\n				<input type="radio" id="radio-all" value="all" name="filter" checked />\n				<label for="radio-all" class="all">All</label>\n				<input type="radio" id="radio-errors" value="errors" name="filter" />\n				<label for="radio-errors" class="count-error">errors (' +
@@ -42,7 +42,7 @@
 	'</code></pre>\n						</li>\n						';
 	 }__p += '\n					</ul>\n				</output>\n			</form>\n\n			<hr />\n\n			<footer>\n				<p>Generated at: ' +
 	((__t = ( data.date.toLocaleString() )) == null ? '' : __t) +
-	'</p>\n				<p>Powered by <a href="http://pa11y.org/" target="_blank"><img src="http://pa11y.org/resources/brand/logo.svg" alt="Pa11y logo" />Pa11y</a</p>\n			</footer>\n		</div>\n	</div>\n</body>\n</html>';
+	'</p>\n				<p class="credits">Powered by <a href="http://pa11y.org/" target="_blank"><img src="http://pa11y.org/resources/brand/logo.svg" alt="Pa11y logo" />Pa11y</a</p>\n			</footer>\n		</div>\n	</div>\n</body>\n</html>';
 	return __p
 	}
 

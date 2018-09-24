@@ -16,11 +16,6 @@ sendData = async function (ev) {
 
     const resultContainer = document.querySelector('.result-container');
 
-    if (!url) {
-        resultContainer.innerHTML = missingUrlErrorMessage('Please insert an url.');
-        return;
-    }
-
     resultContainer.innerHTML = `<div class="loader"></div>`;
 
     fetch(`${document.location.origin}/?url=${url}`)

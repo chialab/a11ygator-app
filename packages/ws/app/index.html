@@ -7,26 +7,37 @@
 </head>
 
 <body>
-    <div class="form-container">
+    <header>
+        <div class="container">
+            <a href="http://pa11y.org/" target="_blank">
+                <img src="http://pa11y.org/resources/brand/logo.svg" alt="" class="site-brand__logo">
+                <span class="site-brand__name">Pa11y</span>
+            </a>
+        </div>
+    </header>
+    <div class="container form-container">
+        <p>
+            Validate your Web Site with Pa11y:
+        </p>
         <form id="site-form" onsubmit="sendData(event)" method="POST">
             <div class="site-url-container">
-                <input type="text" name="url" placeholder="Type an url">
+                <input type="text" name="url" placeholder="https://www.google.com" required>
+                <button type="submit" form="site-form" id="submit-button">Check</button>
             </div>
-
             <div class="options-container">
-                <select name="standard">
-                    <option value="" selected disabled hidden>Choose a standard</option>
+                <label for="standard">Standard:</label>
+                <select name="standard" id="standard">
                     <option value="WCAG2AAA">WCAG2AAA</option>
-                    <option value="WCAG2AA">WCAG2AA</option>
+                    <option value="WCAG2AA" selected>WCAG2AA</option>
                     <option value="WCAG2A">WCAG2A</option>
                     <option value="Section508">Section508</option>
                 </select>
-                <input type="numeric" name="wait" placeholder="Type wait time in ms" />
+                <label for="wait">Wait time (ms):</label>
+                <input type="number" min="0" step="1" size="3" max="10000" id="wait" name="wait" />
             </div>
-            <button type="submit" form="site-form" id="submit-button">CHECK</button>
         </form>
     </div>
-    <div class="result-container"></div>
+    <output class="result-container container"></output>
 </body>
 
 </html>

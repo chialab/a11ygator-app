@@ -57,7 +57,7 @@
 
 			<footer>
 				<p>Generated at: <%= data.date.toLocaleString() %></p>
-				<p>Powered by <a href="http://pa11y.org/" target="_blank"><img src="http://pa11y.org/resources/brand/logo.svg" alt="Pa11y logo" />Pa11y</a</p>
+				<p class="credits">Powered by <a href="http://pa11y.org/" target="_blank"><img src="http://pa11y.org/resources/brand/logo.svg" alt="Pa11y logo" />Pa11y</a</p>
 			</footer>
 		</div>
 	</div>
