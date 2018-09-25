@@ -6,15 +6,11 @@ import jst from 'rollup-plugin-jst';
 export default {
     output: {
         format: 'umd',
+        strict : false,
     },
     plugins: [
         resolve(),
-        commonjs({
-            exclude: [
-                'node_modules/pa11y/lib/vendor/HTMLCS.js',
-                'node_modules/pa11y/lib/runner.js',
-            ],
-        }),
+        commonjs(),
         jst({
             extensions: ['.tpl'],
         }),
@@ -22,8 +18,6 @@ export default {
             include: [
                 '**/*.html',
                 '**/*.css',
-                'node_modules/pa11y/lib/vendor/HTMLCS.js',
-                'node_modules/pa11y/lib/runner.js'
             ]
         }),
     ],

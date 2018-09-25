@@ -44,9 +44,9 @@
 						for (let i = 0; i < issues.length; i++) { 
 							let issue = issues[i]; %>
 						<li class="result <%= issue.type %>" data-selector="<%= issue.selector %>">
-							<h2><%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
-							<p><%= issue.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></p>
-							<pre><code><%= issue.context.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></code></pre>
+							<h2 class="issue-title"><%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
+							<p class="issue-rule"><%= issue.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></p>
+							<pre class="issue-code"><code><%= (issue.context || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') %></code></pre>
 						</li>
 						<% } %>
 					</ul>
@@ -57,7 +57,7 @@
 
 			<footer>
 				<p>Generated at: <%= data.date.toLocaleString() %></p>
-				<p class="credits">Powered by <a href="http://pa11y.org/" target="_blank"><img src="http://pa11y.org/resources/brand/logo.svg" alt="Pa11y logo" />Pa11y</a</p>
+				<p class="credits">Powered by <a href="http://pa11y.org/" target="_blank"><img src="http://pa11y.org/resources/brand/logo.svg" alt="Pa11y logo" />Pa11y</a></p>
 			</footer>
 		</div>
 	</div>
