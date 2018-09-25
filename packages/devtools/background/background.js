@@ -32,9 +32,9 @@ function handleReport(report) {
     if (errorsCount > 0) {
         setBadge(errorsCount, '#E74C3C');
     } else if (warningsCount > 0) {
-        setBadge(errorsCount, '#F39C12');
+        setBadge(warningsCount, '#F39C12');
     } else if (noticesCount > 0) {
-        setBadge(errorsCount, '#3498DB');
+        setBadge(noticesCount, '#3498DB');
     }
 }
 
@@ -53,8 +53,14 @@ function checkStatus() {
             return;
         }
 
-        let id = tabs[0].id;
+        let tab = tabs[0];
+        let id = tab.id;
+        if (!tab.url) {
+            chrome.browserAction.disable(id);
+            return;
+        }
 
+        chrome.browserAction.enable(id);
         if (id in reports) {
             handleReport(reports[id]);
         }

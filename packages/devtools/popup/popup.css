@@ -124,17 +124,22 @@ nav button {
     white-space: nowrap;
 }
 
+nav button[disabled] {
+    cursor: default;
+    opacity: 0.5;
+}
+
 nav button[data-count]:not([data-count='0'])::after {
     content: ' (' attr(data-count) ')';
 }
 
-nav button:focus,
-nav button:hover {
+nav button:not([disabled]):focus,
+nav button:not([disabled]):hover {
     background: rgba(0, 0, 0, 0.05);
     transition: none;
 }
 
-nav button:active {
+nav button:not([disabled]):active {
     background: rgba(0, 0, 0, 0.1);
     transition: none;
 }

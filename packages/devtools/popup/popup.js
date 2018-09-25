@@ -22,8 +22,23 @@ async function onResponse(response) {
         };
 
         document.querySelector('button[value="errors"]').setAttribute('data-count', counts.errorCount);
+        if (!counts.errorCount) {
+            document.querySelector('button[value="errors"]').setAttribute('disabled', '');
+        } else {
+            document.querySelector('button[value="errors"]').removeAttribute('disabled');
+        }
         document.querySelector('button[value="warnings"]').setAttribute('data-count', counts.warningCount);
+        if (!counts.warningCount) {
+            document.querySelector('button[value="warnings"]').setAttribute('disabled', '');
+        } else {
+            document.querySelector('button[value="warnings"]').removeAttribute('disabled');
+        }
         document.querySelector('button[value="notices"]').setAttribute('data-count', counts.noticeCount);
+        if (!counts.noticeCount) {
+            document.querySelector('button[value="notices"]').setAttribute('disabled', '');
+        } else {
+            document.querySelector('button[value="notices"]').removeAttribute('disabled');
+        }
 
         let html = await Reporter.results(response.result);
         render(html);
