@@ -74,6 +74,10 @@ function checkStatus() {
     });
 }
 
+chrome.runtime.onInstalled.addListener((details) => {
+    checkStatus();
+});
+
 chrome.tabs.onActivated.addListener((info) => {
     closePopup();
     removeBadge();
