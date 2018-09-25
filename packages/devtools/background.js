@@ -1,4 +1,5 @@
-let lastReport;
+let report = {};
+let running = false;
 
 function removeBadge() {
     chrome.browserAction.setBadgeText({ text: '' });
@@ -11,14 +12,12 @@ function setBadge(number, color) {
 
 chrome.tabs.onActivated.addListener((activeInfo) => {
     removeBadge();
-    return chrome.tabs.sendMessage(activeInfo.tabId, {
-        type: 'pa11y_request',
-    });
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === 'pa11y_report') {
-        lastReport = {
+        running = false;
+        report = {
             result: request.result,
             error: request.error,
         };
@@ -51,14 +50,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
         chrome.runtime.sendMessage({
             type: 'pa11y_report_popup',
-            result: lastReport.result,
-            error: lastReport.error,
+            result: report.result,
+            error: report.error,
+            running: running,
         });
     } else if (request.type === 'pa11y_request_popup') {
+        sendResponse({
+            result: report.result,
+            error: report.error,
+            running: running,
+        });
+    } else if (request.type === 'pa11y_running') {
+        running = true;
         chrome.runtime.sendMessage({
             type: 'pa11y_report_popup',
-            result: lastReport.result,
-            error: lastReport.error,
+            result: report.result,
+            error: report.error,
+            running: running,
         });
     }
     return true;

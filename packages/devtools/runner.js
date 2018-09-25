@@ -315,14 +315,6 @@
 	let lastResult;
 	let lastError;
 
-	function notify() {
-	    chrome.runtime.sendMessage({
-	        type: 'pa11y_report',
-	        result: lastResult,
-	        error: lastError,
-	    });
-	}
-
 	function run() {
 	    window._runPa11y({
 	        hideElements: null,
@@ -334,26 +326,31 @@
 	    }).then((res) => {
 	        lastResult = res;
 	        lastError = null;
-	        notify();
+	        chrome.runtime.sendMessage({
+	            type: 'pa11y_report',
+	            result: lastResult,
+	            error: lastError,
+	        });
 	    }).catch((err) => {
 	        lastError = err;
 	        lastResult = null;
-	        notify();
+	        chrome.runtime.sendMessage({
+	            type: 'pa11y_report',
+	            result: lastResult,
+	            error: lastError,
+	        });
 	    });
 	}
-
-	chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-	    if (request.type === 'pa11y_request') {
-	        notify();
-	    }
-	});
 
 	window.addEventListener('load', () => {
 	    run();
 
 	    let timeout;
 	    let config = { attributes: true, childList: true, subtree: true };
-	    let callback = function(mutationsList, observer) {
+	    let callback = function() {
+	        chrome.runtime.sendMessage({
+	            type: 'pa11y_running',
+	        });
 	        clearTimeout(timeout);
 	        timeout = setTimeout(() => {
 	            run();

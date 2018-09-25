@@ -95,34 +95,30 @@
 	})));
 	});
 
-	async function render(html) {
+	function render(html) {
 	    let frame = document.getElementById('report');
 	    frame.innerHTML = html;
 	}
 
-	async function highlight(selector) {
-	    await inject(`inspect($('${selector}'))`);
+	async function onResponse(response) {
+	    if (response.running) {
+	        render('');
+	    } else if (response.result) {
+	        let html = await reporter.results(response.result);
+	        render(html);
+	    } else {
+	        render('Nothing to show.');
+	    }
 	}
 
-	document.addEventListener('click', async (ev) => {
-	    if (ev.target.closest('[data-selector]')) {
-	        await highlight(ev.target.closest('[data-selector]').getAttribute('data-selector'));
-	    }
-	});
-
-	chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+	chrome.runtime.onMessage.addListener((request) => {
 	    if (request.type === 'pa11y_report_popup') {
-	        if (request.result) {
-	            let html = await reporter.results(request.result);
-	            await render(html);
-	        } else {
-	            await render('Nothing to show.');
-	        }
+	        onResponse(request);
 	    }
 	});
 
 	chrome.runtime.sendMessage({
 	    type: 'pa11y_request_popup',
-	});
+	}, onResponse);
 
 })));

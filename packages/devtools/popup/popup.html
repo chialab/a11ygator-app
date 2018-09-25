@@ -5,13 +5,13 @@
     <style>
         html, body {
             margin: 0;
-            padding: 0;
+            padding: 0.5rem;
+            width: 30em;
             font-size: 14px;
         }
 
         #report {
             display: block;
-            max-width: 30rem;
         }
 
         #report h1,
@@ -25,10 +25,6 @@
             font-size: 14px;
         }
 
-        #report .pa11y-report {
-            padding-left: 16px;
-        }
-
         #report label {
             flex: 1 auto;
         }
@@ -38,14 +34,51 @@
             margin: 0;
         }
 
-        #report .result {
-            cursor: pointer;
+        #loader {
+            width: 3em;
+            height: 3em;
+            margin: 3em auto;
+            border-radius: 50%;
+            animation: rotate 1.4s infinite ease-in-out, background 1.4s infinite ease-in-out alternate;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+            }
+
+            50% {
+                transform: perspective(120px) rotateX(-180deg) rotateY(0deg);
+            }
+
+            100% {
+                transform: perspective(120px) rotateX(-180deg) rotateY(-180deg);
+            }
+        }
+
+        @keyframes background {
+            0% {
+                background-color: #E74C3C;
+            }
+
+            50% {
+                background-color: #F39C12;
+            }
+
+            100% {
+                background-color: #3498DB;
+            }
+        }
+
+        #report:not(:empty) + #loader {
+            display: none;
         }
     </style>
 </head>
 
 <body>
     <div id="report"></div>
+    <div id="loader"></div>
     <script src="popup.js"></script>
 </body>
 
