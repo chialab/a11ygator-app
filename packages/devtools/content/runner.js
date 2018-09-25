@@ -4,6 +4,18 @@
 
     let timeout;
 
+    let settings = window.pa11ySettings || {};
+    
+    Object.defineProperty(window, 'pa11ySettings', {
+        get() {
+            return settings;
+        },
+        set(value) {
+            settings = value;
+            run();
+        }
+    });
+
     function run() {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
@@ -12,7 +24,7 @@
                 ignore: [],
                 rootElement: null,
                 rules: [],
-                standard: 'WCAG2AA',
+                standard: settings.standard || 'WCAG2AA',
                 wait: 0,
             }).then((res) => {
                 lastResult = res;

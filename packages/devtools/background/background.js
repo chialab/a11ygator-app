@@ -61,9 +61,16 @@ function checkStatus() {
         }
 
         chrome.browserAction.enable(id);
-        if (id in reports) {
-            handleReport(reports[id]);
-        }
+        chrome.storage.local.get({
+            standard: 'WCAG2AA',
+        }, (settings) => {
+            chrome.tabs.executeScript(id, {
+                code: `window.pa11ySettings = ${JSON.stringify(settings)}`,
+            });
+            if (id in reports) {
+                handleReport(reports[id]);
+            }
+        });
     });
 }
 
@@ -108,14 +115,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         } else if (request.type === 'pa11y_request') {
             sendResponse(reports[id]);
             if (!(id in reports)) {
-                [
-                    'vendors/HTMLCS.js',
-                    'vendors/pa11y.runner.js',
-                    'content/inspector.js',
-                    'content/runner.js',
-                ].forEach((file) => {
+                chrome.storage.local.get({
+                    standard: 'WCAG2AA',
+                }, (settings) => {
                     chrome.tabs.executeScript(id, {
-                        file: file,
+                        code: `window.pa11ySettings = ${JSON.stringify(settings)}`,
+                    });
+
+                    [
+                        'vendors/HTMLCS.js',
+                        'vendors/pa11y.runner.js',
+                        'content/inspector.js',
+                        'content/runner.js',
+                    ].forEach((file) => {
+                        chrome.tabs.executeScript(id, {
+                            file: file,
+                        });
                     });
                 });
             }
@@ -140,4 +155,4 @@ chrome.extension.onConnect.addListener((port) => {
             });
         });
     }
-})
+});
