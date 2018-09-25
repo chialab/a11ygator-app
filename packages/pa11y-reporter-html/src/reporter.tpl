@@ -26,32 +26,31 @@
 			</div>
 			<% } %>
 
-			<form>
-				<input type="radio" id="radio-all" value="all" name="filter" checked />
-				<label for="radio-all" class="all">All</label>
-				<input type="radio" id="radio-errors" value="errors" name="filter" />
-				<label for="radio-errors" class="count-error">Errors (<%= data.errorCount %>)</label>
-				<input type="radio" id="radio-warnings" value="warnings" name="filter" />
-				<label for="radio-warnings" class="count-warning">Warnings (<%= data.warningCount %>)</label>
-				<input type="radio" id="radio-notices" value="notices" name="filter" />
-				<label for="radio-notices" class="count-notice">Notices (<%= data.noticeCount %>)</label>
-
-				<output>
-					<ul class="clean-list results-list">
-						<%
-						let issues = data.issues.slice(0);
-						issues.sort((issue1, issue2) => parseFloat(issue1.typeCode) - parseFloat(issue2.typeCode));
-						for (let i = 0; i < issues.length; i++) { 
-							let issue = issues[i]; %>
-						<li class="result <%= issue.type %>" data-selector="<%= issue.selector %>">
-							<h2 class="issue-title"><%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
-							<p class="issue-rule"><%= issue.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></p>
-							<pre class="issue-code"><code><%= (issue.context || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') %></code></pre>
-						</li>
-						<% } %>
-					</ul>
-				</output>
-			</form>
+			<ul class="results-list">
+				<%
+				var issues = data.issues
+					.slice(0)
+					.sort((issue1, issue2) => {
+						if (issue1.typeCode !== issue2.typeCode) {
+							return parseFloat(issue1.typeCode) - parseFloat(issue2.typeCode);
+						}
+						if (issue1.code !== issue2.code) {
+							return issue1.code.localeCompare(issue2.code);
+						}
+						if (issue1.context !== issue2.context) {
+							return issue1.context.localeCompare(issue2.context);
+						}
+						return 0;
+					});
+				for (let i = 0; i < issues.length; i++) { 
+					let issue = issues[i]; %>
+				<li class="result <%= issue.type %>" data-selector="<%= issue.selector %>">
+					<h2 class="issue-title"><%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
+					<p class="issue-rule"><%= issue.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></p>
+					<pre class="issue-code"><code><%= (issue.context || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') %></code></pre>
+				</li>
+				<% } %>
+			</ul>
 
 			<hr />
 

@@ -2,83 +2,24 @@
 <html>
 
 <head>
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0.5rem;
-            width: 30em;
-            font-size: 14px;
-        }
-
-        #report {
-            display: block;
-        }
-
-        #report h1,
-        #report footer,
-        #report hr {
-            display: none;
-        }
-
-        #report .pa11y-page {
-            padding: 0;
-            font-size: 14px;
-        }
-
-        #report label {
-            flex: 1 auto;
-        }
-        
-        #report form {
-            justify-content: center;
-            margin: 0;
-        }
-
-        #loader {
-            width: 3em;
-            height: 3em;
-            margin: 3em auto;
-            border-radius: 50%;
-            animation: rotate 1.4s infinite ease-in-out, background 1.4s infinite ease-in-out alternate;
-        }
-
-        @keyframes rotate {
-            0% {
-                transform: perspective(120px) rotateX(0deg) rotateY(0deg);
-            }
-
-            50% {
-                transform: perspective(120px) rotateX(-180deg) rotateY(0deg);
-            }
-
-            100% {
-                transform: perspective(120px) rotateX(-180deg) rotateY(-180deg);
-            }
-        }
-
-        @keyframes background {
-            0% {
-                background-color: #E74C3C;
-            }
-
-            50% {
-                background-color: #F39C12;
-            }
-
-            100% {
-                background-color: #3498DB;
-            }
-        }
-
-        #report:not(:empty) + #loader {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
-    <div id="report"></div>
-    <div id="loader"></div>
+    <div class="refreshbar">
+        New errors found. <button>Refresh</button>
+    </div>
+    <div class="wrapper">
+        <nav>
+            <button>All</button>
+            <button class="count-errors" value="errors">Errors</button>
+            <button class="count-warnings" value="warnings">Warnings</button>
+            <button class="count-notices" value="notices">Notices</button>
+        </nav>
+        <div id="report"></div>
+        <div id="loader"></div>
+    </div>
+    <script src="../vendors/reporter.js"></script>
     <script src="popup.js"></script>
 </body>
 

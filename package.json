@@ -10,10 +10,8 @@
   },
   "scripts": {
     "start": "node packages/ws/index.js",
-    "build": "npm run build-reporter && npm run build-devtools && npm run build-devtools-runner",
-    "build-reporter": "rollup packages/pa11y-reporter-html/src/reporter.js --name 'Reporter' --file packages/pa11y-reporter-html/lib/reporter.js --config",
-    "build-devtools": "rollup packages/devtools/src/popup/popup.js --name 'popup' --file packages/devtools/popup/popup.js --config",
-    "build-devtools-runner": "rollup packages/devtools/src/runner.js --name 'popup' --file packages/devtools/runner.js --config"
+    "build": "npm run build-reporter",
+    "build-reporter": "rollup packages/pa11y-reporter-html/src/reporter.js --name 'Reporter' --file packages/pa11y-reporter-html/lib/reporter.js --config"
   },
   "author": "Chialab",
   "license": "MIT",

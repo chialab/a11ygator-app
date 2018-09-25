@@ -93,93 +93,14 @@
     padding: 2rem 1rem;
 }
 
-.pa11y-report form {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    margin-top: 30px;
-}
-
-.pa11y-report form label {
-    position: relative;
-    padding: 1rem;
-    margin-bottom: 2px;
-    font-size: 1em;
-    line-height: 1em;
-    background: transparent;
-    border: 0;
-    border-radius: 0;
-    cursor: pointer;
-    transition: background 150ms ease-out;
-    outline: 0;
-}
-
-.pa11y-report form input {
-    display: none;
-}
-
-.pa11y-report form input:checked + label {
-    border-bottom: solid 2px currentColor;
-    margin-bottom: 0;
-}
-
-.pa11y-report form label:focus,
-.pa11y-report form label:hover {
-    background: rgba(0, 0, 0, 0.05);
-    transition: none;
-}
-
-.pa11y-report form label:active {
-    background: rgba(0, 0, 0, 0.1);
-    transition: none;
-}
-
-.pa11y-report form output {
-    display: block;
-    flex: none;
-    width: 100%;
-}
-
 .pa11y-report .issue-rule {
     word-break: break-all;
 }
 
-.pa11y-report form input:not([value="all"]):checked ~ output li {
-    display: none;
-}
-
-.pa11y-report form input[value="errors"]:checked ~ output li.error {
-    display: block;
-}
-
-.pa11y-report form input[value="warnings"]:checked ~ output li.warning {
-    display: block;
-}
-
-.pa11y-report form input[value="notices"]:checked ~ output li.notice {
-    display: block;
-}
-
-.pa11y-report .count-error {
-    color: #E74C3C;
-}
-
-.pa11y-report .count-warning {
-    color: #F39C12;
-}
-
-.pa11y-report .count-notice {
-    color: #3498DB;
-}
-
-.pa11y-report .clean-list {
+.pa11y-report .results-list {
     margin-left: 0;
     padding-left: 0;
     list-style: none;
-}
-
-.pa11y-report .results-list {
     margin-top: 1rem;
 }
 

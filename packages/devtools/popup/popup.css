@@ -1,0 +1,192 @@
+html, body {
+    margin: 0;
+    padding: 0.5rem 0.5rem 2rem 0.5rem;
+    width: 30em;
+    font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+}
+
+*,
+*::before,
+*:after {
+    box-sizing: border-box;
+}
+
+#loader {
+    width: 3em;
+    height: 3em;
+    margin: 3em auto;
+    border-radius: 50%;
+    animation: rotate 1.4s infinite ease-in-out, background 1.4s infinite ease-in-out alternate;
+}
+
+@keyframes rotate {
+    0% {
+        transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+    }
+
+    50% {
+        transform: perspective(120px) rotateX(-180deg) rotateY(0deg);
+    }
+
+    100% {
+        transform: perspective(120px) rotateX(-180deg) rotateY(-180deg);
+    }
+}
+
+@keyframes background {
+    0% {
+        background-color: #E74C3C;
+    }
+
+    50% {
+        background-color: #F39C12;
+    }
+
+    100% {
+        background-color: #3498DB;
+    }
+}
+
+.refreshbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    padding: 1rem;
+    background: #333;
+    color: #fff;
+
+    animation: slideIn 250ms ease-out;
+}
+
+.refreshbar button {
+    display: block;
+    margin-left: auto;
+    font-size: 1em;
+    line-height: 2em;
+    cursor: pointer;
+    color: #fff;
+    background-color: #3498DB;
+    border: 0;
+    border-radius: 2px;
+    outline: none;
+}
+
+@keyframes slideIn {
+    0% {
+        transform: translateY(100%);
+    }
+
+    100% {
+        transform: none;
+    }
+}
+
+body:not([refreshable]) .refreshbar {
+    display: none;
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    margin: -1rem -1rem 0;
+    padding: 0;
+    border-bottom: solid 1px #ccc;
+}
+
+nav button {
+    position: relative;
+    padding: 1rem;
+    margin: 0;
+    font-size: 1em;
+    line-height: 1em;
+    background: transparent;
+    border-top: solid 2px transparent;
+    border-bottom: solid 2px transparent;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+    cursor: pointer;
+    transition: background 150ms ease-out;
+    outline: 0;
+    flex: 1 auto;
+}
+
+nav button[data-count]:not([data-count='0'])::after {
+    content: ' (' attr(data-count) ')';
+}
+
+nav button:focus,
+nav button:hover {
+    background: rgba(0, 0, 0, 0.05);
+    transition: none;
+}
+
+nav button:active {
+    background: rgba(0, 0, 0, 0.1);
+    transition: none;
+}
+
+nav button.count-errors {
+    color: #E74C3C;
+}
+
+nav button.count-warnings {
+    color: #F39C12;
+}
+
+nav button.count-notices {
+    color: #3498DB;
+}
+
+#report {
+    display: block;
+}
+
+#report h1,
+#report footer,
+#report hr {
+    display: none;
+}
+
+#report .pa11y-page {
+    padding: 0;
+    font-size: 14px;
+}
+
+#report label {
+    flex: 1 auto;
+}
+
+#report form {
+    justify-content: center;
+    margin: 0;
+}
+
+#report:not(:empty) + #loader {
+    display: none;
+}
+
+body.filter-errors #report .result:not(.error) {
+    display: none;
+}
+
+body.filter-warnings #report .result:not(.warning) {
+    display: none;
+}
+
+body.filter-notices #report .result:not(.notice) {
+    display: none;
+}
+
+body:not([class*='filter-']) nav button:not([value]),
+body.filter-errors nav button[value='errors'],
+body.filter-warnings nav button[value='warnings'],
+body.filter-notices nav button[value='notices'] {
+    border-bottom: solid 2px currentColor;
+}
