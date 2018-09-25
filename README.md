@@ -9,16 +9,27 @@ yarn install
 yarn start
 ```
 
-## Usage
+## App Usage
 
 In local environment, navigate with the browser to
+
+```
+https://localhost:9000/app
+```
+
+in order to visualize the app home page.
+
+### API Usage
+
+It is also possible to directly use `chia11y` API.
+
+To get an HTML report with default options, make a GET call to
 
 ```
 https://localhost:9000?url=<site-to-test>
 ```
 
-Currently it is possible to pass more info to the server with a `POST` request.
-Options can be passed on the `body` of the Request.
+To pass options, please make a POST call embedding them on the body reqyest.
 
 Example:
 
