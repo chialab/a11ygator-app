@@ -1,9 +1,15 @@
-html, body {
+html {
+    padding: 0;
     margin: 0;
-    padding: 0.5rem 0.5rem 2rem 0.5rem;
+}
+
+body {
+    padding: 0.5rem 1rem 2rem 1rem;
+    margin: 0;
     width: 30em;
     font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
+    overflow: overlay;
 }
 
 *,
@@ -106,7 +112,7 @@ nav button {
     font-size: 1em;
     line-height: 1em;
     background: transparent;
-    border-top: solid 2px transparent;
+    border-top: solid 4px transparent;
     border-bottom: solid 2px transparent;
     border-right: 0;
     border-left: 0;
@@ -115,6 +121,7 @@ nav button {
     transition: background 150ms ease-out;
     outline: 0;
     flex: 1 auto;
+    white-space: nowrap;
 }
 
 nav button[data-count]:not([data-count='0'])::after {

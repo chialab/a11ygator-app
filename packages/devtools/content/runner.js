@@ -34,26 +34,23 @@
         }, 1000);
     }
 
-    window.addEventListener('load', () => {
-        run();
-
-        let config = { attributes: true, childList: true, subtree: true };
-        let callback = function(mutationsList) {
-            for (let mutation of mutationsList) {
-                if (mutation.target === inspector.overlay || inspector.overlay.contains(mutation.target)) {
-                    return false;
-                }
-                if (mutation.addedNodes && [...mutation.addedNodes].includes(inspector.overlay)) {
-                    return false;
-                }
-                if (mutation.removedNodes && [...mutation.removedNodes].includes(inspector.overlay)) {
-                    return false;
-                }
+    let config = { attributes: true, childList: true, subtree: true };
+    let callback = function(mutationsList) {
+        for (let mutation of mutationsList) {
+            if (mutation.target === inspector.overlay || inspector.overlay.contains(mutation.target)) {
+                return false;
             }
-            run();
-        };
+            if (mutation.addedNodes && [...mutation.addedNodes].includes(inspector.overlay)) {
+                return false;
+            }
+            if (mutation.removedNodes && [...mutation.removedNodes].includes(inspector.overlay)) {
+                return false;
+            }
+        }
+        run();
+    };
+    let observer = new MutationObserver(callback);
 
-        let observer = new MutationObserver(callback);
-        observer.observe(document.body, config);
-    });
+    observer.observe(document.body, config);
+    run();
 })();

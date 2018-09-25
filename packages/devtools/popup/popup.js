@@ -11,6 +11,9 @@ function render(html) {
 }
 
 async function onResponse(response) {
+    if (!response) {
+        return;
+    }
     if (response.result) {
         let counts = {
             errorCount: response.result.issues.filter(issue => issue.type === 'error').length,
@@ -30,14 +33,17 @@ async function onResponse(response) {
 }
 
 chrome.runtime.onMessage.addListener((request) => {
-    if (request.type === 'pa11y_report_popup') {
+    if (request.type === 'pa11y_report') {
+        if (!lastReport) {
+            onResponse(request);
+        }
         lastReport = request;
         document.body.setAttribute('refreshable', '');
     }
 });
 
 chrome.runtime.sendMessage({
-    type: 'pa11y_request_popup',
+    type: 'pa11y_request',
 }, onResponse);
 
 document.addEventListener('mouseover', (event) => {
@@ -48,12 +54,9 @@ document.addEventListener('mouseover', (event) => {
             active: true,
             currentWindow: true,
         }, (tabs) => {
-            chrome.tabs.executeScript(
-                tabs[0].id,
-                {
-                    code: `inspector.inspect('${selector}');`,
-                }
-            );
+            chrome.tabs.executeScript(tabs[0].id,{
+                code: `inspector.inspect('${selector}');`,
+            });
         });
     } else {
         chrome.tabs.query({
@@ -82,4 +85,8 @@ document.querySelectorAll('nav button').forEach((button) => {
             document.body.classList.add(`filter-${button.value}`);
         }
     });
+});
+
+chrome.extension.connect({
+    name: 'popup',
 });

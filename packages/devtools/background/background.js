@@ -44,20 +44,41 @@ function closePopup() {
     });
 }
 
+function checkStatus() {
+    chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+    }, (tabs) => {
+        if (!tabs.length) {
+            return;
+        }
+
+        let id = tabs[0].id;
+
+        if (id in reports) {
+            handleReport(reports[id]);
+        }
+    });
+}
+
 chrome.tabs.onActivated.addListener((info) => {
     closePopup();
-    handleReport(reports[info.tabId]);
+    removeBadge();
+    checkStatus();
 });
 
 chrome.tabs.onUpdated.addListener((info) => {
+    delete reports[info];
     closePopup();
     removeBadge();
-    delete reports[info.tabId];
+    checkStatus();
 });
 
 chrome.tabs.onRemoved.addListener((info) => {
+    delete reports[info];
+    closePopup();
     removeBadge();
-    delete reports[info.tabId];
+    checkStatus();
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -68,21 +89,49 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (!tabs.length) {
             return;
         }
+
+        let id = tabs[0].id;
+
         if (request.type === 'pa11y_report') {
             let report = {
                 result: request.result,
                 error: request.error,
             };
-            reports[tabs[0].id] = report;
+            reports[id] = report;
             handleReport(report);
-            chrome.runtime.sendMessage({
-                type: 'pa11y_report_popup',
-                result: report.result,
-                error: report.error,
-            });
-        } else if (request.type === 'pa11y_request_popup') {
-            sendResponse(reports[tabs[0].id] || {});
+        } else if (request.type === 'pa11y_request') {
+            sendResponse(reports[id]);
+            if (!(id in reports)) {
+                [
+                    'vendors/HTMLCS.js',
+                    'vendors/pa11y.runner.js',
+                    'content/inspector.js',
+                    'content/runner.js',
+                ].forEach((file) => {
+                    chrome.tabs.executeScript(id, {
+                        file: file,
+                    });
+                });
+            }
         }
     });
     return true;
 });
+
+chrome.extension.onConnect.addListener((port) => {
+    if (port.name === 'popup') {
+        port.onDisconnect.addListener(() => {
+            chrome.tabs.query({
+                active: true,
+                currentWindow: true,
+            }, (tabs) => {
+                chrome.tabs.executeScript(
+                    tabs[0].id,
+                    {
+                        code: `inspector.clear();`,
+                    }
+                );
+            });
+        });
+    }
+})
