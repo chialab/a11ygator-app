@@ -58,29 +58,33 @@ class Inspector {
     }
 
     inspect(element) {
-        if (typeof element === 'string') {
-            element = document.querySelector(element);
-        }
-
-        element.scrollIntoView({
-            behavior: 'instant',
-            block: 'center',
-            inline: 'center',
-        });
-
-        let rect = element.getBoundingClientRect();
-        if (rect.width || rect.height) {
-            this.overlayElement.style.top = `${rect.top}px`;
-            this.overlayElement.style.left = `${rect.left}px`;
-            this.overlayElement.style.width = `${rect.width}px`;
-            this.overlayElement.style.height = `${rect.height}px`;
-
-            if (!this.overlay.parentNode) {
-                this.root.appendChild(this.overlay);
+        try {
+            if (typeof element === 'string') {
+                element = document.querySelector(element);
             }
-        } else {
-            this.clear();
+
+            element.scrollIntoView({
+                behavior: 'instant',
+                block: 'center',
+                inline: 'center',
+            });
+
+            let rect = element.getBoundingClientRect();
+            if (rect.width || rect.height) {
+                this.overlayElement.style.top = `${rect.top}px`;
+                this.overlayElement.style.left = `${rect.left}px`;
+                this.overlayElement.style.width = `${rect.width}px`;
+                this.overlayElement.style.height = `${rect.height}px`;
+
+                if (!this.overlay.parentNode) {
+                    this.root.appendChild(this.overlay);
+                }
+                return;
+            }
+        } catch (err) {
+            //
         }
+        this.clear();
     }
 
     clear() {

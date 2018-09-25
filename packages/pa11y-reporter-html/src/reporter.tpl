@@ -34,12 +34,6 @@
 						if (issue1.typeCode !== issue2.typeCode) {
 							return parseFloat(issue1.typeCode) - parseFloat(issue2.typeCode);
 						}
-						if (issue1.code !== issue2.code) {
-							return issue1.code.localeCompare(issue2.code);
-						}
-						if (issue1.context !== issue2.context) {
-							return issue1.context.localeCompare(issue2.context);
-						}
 						return 0;
 					});
 				for (let i = 0; i < issues.length; i++) { 

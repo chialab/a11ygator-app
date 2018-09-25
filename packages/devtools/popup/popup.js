@@ -25,7 +25,7 @@ async function onResponse(response) {
         let html = await Reporter.results(response.result);
         render(html);
     } else {
-        render('Nothing to show.');
+        render('<p>Nothing to show.</p>');
     }
 }
 
