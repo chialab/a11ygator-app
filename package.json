@@ -4,10 +4,7 @@
   "version": "1.0.0",
   "description": "A Web dashboard for accessibility tests.",
   "main": "server.js",
-  "repository": {
-    "type": "git",
-    "url": "git@gitlab.com:chialab/a11ygator.git"
-  },
+  "repository": "github:chialab/a11ygator-app",
   "scripts": {
     "start": "node server.js",
     "build": "rollup src/reporter/index.js --name 'Reporter' --file dist/reporter.js --config"
