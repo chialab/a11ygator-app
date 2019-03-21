@@ -2,8 +2,8 @@
   "name": "@chialab/a11ygator-app",
   "private": true,
   "version": "1.0.0",
-  "description": "A web dashboard for accessibility tests results.",
-  "main": "index.js",
+  "description": "A Web dashboard for accessibility tests.",
+  "main": "server.js",
   "repository": {
     "type": "git",
     "url": "git@gitlab.com:chialab/a11ygator.git"
@@ -14,9 +14,6 @@
   },
   "author": "Chialab",
   "license": "MIT",
-  "workspaces": [
-    "packages/*"
-  ],
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
