@@ -9,7 +9,7 @@
     "url": "git@gitlab.com:chialab/a11ygator.git"
   },
   "scripts": {
-    "start": "yarn install && node packages/app/index.js",
+    "start": "node packages/app/index.js",
     "build": "npm run build-reporter",
     "build-reporter": "rollup packages/pa11y-reporter-html/src/reporter.js --name 'Reporter' --file packages/pa11y-reporter-html/lib/reporter.js --config"
   },
