@@ -1,5 +1,5 @@
 /dist
 /node_modules
 /npm-debug.log
-/src/screenshots/*
-!/src/screenshots/.gitkeep
+/screenshots/*
+!/screenshots/.gitkeep

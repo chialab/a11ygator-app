@@ -2,6 +2,7 @@ const pa11y = require('pa11y');
 const config = require('./config.js');
 const _ = require('lodash');
 const htmlReporter = require('./../dist/reporter.js');
+const path = require('path');
 
 module.exports = a11ygator;
 
@@ -19,8 +20,8 @@ async function a11ygator(url, options) {
 
     // always make a screenshot
     const filename = parseFilename(url);
-    const screenPath = `/screenshots/${filename}.png`;
-    pa11yConfig.screenCapture = `${__dirname}${screenPath}`;
+    const screenPath = `screenshots/${filename}.png`;
+    pa11yConfig.screenCapture = path.resolve(__dirname, `../${screenPath}`);
 
     convertBooleans(pa11yConfig);   // parse configuration's boolean-like values
 

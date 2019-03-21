@@ -50,6 +50,6 @@ COPY . /usr/src/a11ygator/
 RUN yarn run build
 
 EXPOSE ${PORT}
-VOLUME [ "/usr/src/al11ygator/src/screenshots/" ]
+VOLUME [ "/usr/src/al11ygator/screenshots/" ]
 
 CMD [ "yarn", "start" ]
