@@ -1,18 +1,18 @@
 const pa11y = require('pa11y');
-const config = require('@chialab/chia11y-config');
+const config = require('./config.js');
 const _ = require('lodash');
-const htmlReporter = require('@chialab/pa11y-reporter-html');
+const htmlReporter = require('./../dist/reporter.js');
 
-module.exports = chia11y;
+module.exports = a11ygator;
 
 /**
- * Entry point for chia11y requests.
+ * Entry point for a11ygator requests.
  *
  * @param {String} url url to check.
  * @param {Object} options query params from request.
  * @return {Promise}
  */
-async function chia11y(url, options) {
+async function a11ygator(url, options) {
     const pa11yConfig = {};
     // merge base config with query options
     _.merge(pa11yConfig, config, options)

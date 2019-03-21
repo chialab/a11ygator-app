@@ -36,7 +36,7 @@
 						}
 						return 0;
 					});
-				for (let i = 0; i < issues.length; i++) { 
+				for (let i = 0; i < issues.length; i++) {
 					let issue = issues[i]; %>
 				<li class="result <%= issue.type %>" data-selector="<%= issue.selector %>">
 					<h2 class="issue-title"><%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
