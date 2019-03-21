@@ -1,7 +1,7 @@
 FROM node:8
 
 WORKDIR /usr/src/a11ygator
-ENV PORT=6000
+ENV PORT=3000
 
 RUN apt-get update && apt-get install -y \
     gconf-service \
