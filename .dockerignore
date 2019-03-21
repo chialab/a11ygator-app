@@ -1,4 +1,5 @@
 /dist
+/gcp.zip
 /node_modules
 /npm-debug.log
 /screenshots/*
