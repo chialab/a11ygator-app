@@ -32,9 +32,9 @@ POST /report?url=<site-to-test> HTTP/1.1
 Content-Type: application/json
 
 {
-    includeNotices: false,
-    includeWarnings: false,
-    wait: 10000,
+    "includeNotices": false,
+    "includeWarnings": false,
+    "wait": 10000,
     // ...
 }
 ```
