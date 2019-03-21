@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "A Web dashboard for accessibility tests.",
-  "main": "server.js",
+  "main": "src/app.js",
   "repository": "github:chialab/a11ygator-app",
   "scripts": {
     "start": "node server.js",
