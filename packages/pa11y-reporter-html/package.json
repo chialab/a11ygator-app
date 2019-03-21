@@ -5,7 +5,7 @@
   "main": "lib/reporter.js",
   "repository": {
     "type": "git",
-    "url": "git@gitlab.com:chialab/chia11y.git"
+    "url": "git@gitlab.com:chialab/a11ygator.git"
   },
   "author": "Chialab",
   "license": "MIT"

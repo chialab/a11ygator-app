@@ -1,4 +1,4 @@
-# Chia11y
+# a11ygator
 
 A web dashboard for accessibility tests results.
 
@@ -21,7 +21,7 @@ in order to visualize the app home page.
 
 ### API Usage
 
-It is also possible to directly use `chia11y` API.
+It is also possible to directly use `a11ygator` without filling the form.
 
 To get an HTML report with default options, make a GET call to
 

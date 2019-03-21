@@ -1,15 +1,15 @@
 {
-  "name": "chia11y",
+  "name": "a11ygator",
   "private": true,
   "version": "1.0.0",
   "description": "A web dashboard for accessibility tests results.",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git@gitlab.com:chialab/chia11y.git"
+    "url": "git@gitlab.com:chialab/a11ygator.git"
   },
   "scripts": {
-    "start": "node packages/ws/index.js",
+    "start": "yarn install && node packages/app/index.js",
     "build": "npm run build-reporter",
     "build-reporter": "rollup packages/pa11y-reporter-html/src/reporter.js --name 'Reporter' --file packages/pa11y-reporter-html/lib/reporter.js --config"
   },

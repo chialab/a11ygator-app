@@ -1,8 +1,8 @@
 const express = require('express')
-const chia11y = require('./chia11y.js');
+const a11ygator = require('./a11ygator.js');
 const app = express()
 
-const PORT = process.env.PORT || 9000;
+const PORT = process.env.PORT || 6000;
 
 app.use('/screenshots', express.static(__dirname + '/screenshots'));
 app.use('/app', express.static(__dirname + '/app'));
@@ -17,9 +17,9 @@ app.all('/', async function (req, res) {
     if (options.url) {
         delete options.url;
     }
-    return chia11y(url, options).then((result) => res.send(result));
+    return a11ygator(url, options).then((result) => res.send(result));
 });
 
 app.listen(PORT, () => {
-    console.log(`Pa11y dashboard listening on http://localhost:${PORT}`);
+    console.log(`a11ygator listening on http://localhost:${PORT}`);
 });

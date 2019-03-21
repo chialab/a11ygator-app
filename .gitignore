@@ -1,3 +1,3 @@
 node_modules
-packages/ws/screenshots/*
-!packages/ws/screenshots/.gitkeep
+packages/app/screenshots/*
+!packages/app/screenshots/.gitkeep
