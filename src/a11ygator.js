@@ -1,7 +1,7 @@
 const pa11y = require('pa11y');
-const config = require('@chialab/a11ygator-config');
+const config = require('./config.js');
 const _ = require('lodash');
-const htmlReporter = require('@chialab/pa11y-reporter-html');
+const htmlReporter = require('./../dist/reporter.js');
 
 module.exports = a11ygator;
 

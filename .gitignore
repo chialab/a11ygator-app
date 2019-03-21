@@ -1,3 +1,4 @@
-node_modules
-packages/app/screenshots/*
-!packages/app/screenshots/.gitkeep
+/dist
+/node_modules
+/src/screenshots/*
+!/src/screenshots/.gitkeep

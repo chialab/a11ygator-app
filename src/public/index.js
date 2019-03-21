@@ -18,7 +18,7 @@ sendData = async function (ev) {
 
     resultContainer.innerHTML = `<div class="loader"></div>`;
 
-    fetch(`${document.location.origin}/?url=${url}`)
+    fetch(`${document.location.origin}/report?url=${url}`)
         .then((res) => {
             if (res.ok) {
                 return res.text()
