@@ -1,9 +1,12 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const util = require('util');
 const pa11y = require('pa11y');
 const { pa11yConfig, screenshots } = require('./config.js');
 const htmlReporter = require('./../dist/reporter.js');
+
+const copyFile = util.promisify(fs.copyFile);
 
 /**
  * Entry point for a11ygator requests.
@@ -31,7 +34,7 @@ exports.report = async (req, res) => {
 
         // Copy screenshot from temporary directory to final destination.
         const destFile = path.join(screenshots, fileName);
-        fs.copyFileSync(tmpFile, destFile);
+        await copyFile(tmpFile, destFile);
 
         const screenPath = `screenshots/${fileName}`;
         results.screenPath = screenPath;
