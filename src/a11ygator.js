@@ -3,10 +3,13 @@ const os = require('os');
 const path = require('path');
 const util = require('util');
 const pa11y = require('pa11y');
-const { pa11yConfig, screenshots } = require('./config.js');
+const { pa11yConfig } = require('./config.js');
+const adapter = require('./screenshots/index.js');
 const htmlReporter = require('./../dist/reporter.js');
 
-const copyFile = util.promisify(fs.copyFile);
+const mkdtemp = util.promisify(fs.mkdtemp);
+const rmdir = util.promisify(fs.rmdir);
+const unlink = util.promisify(fs.unlink);
 
 /**
  * Entry point for a11ygator requests.
@@ -24,28 +27,42 @@ exports.report = async (req, res) => {
     const options = {}; // TODO
     const config = Object.assign({}, pa11yConfig, options);
 
-    // Screenshot configuration.
-    const fileName = `${req.uuid}.png`;
-    const tmpFile = path.join(os.tmpdir(), fileName);
+    // Setup temporary file for screenshot.
+    const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'a11ygator-'));
+    const tmpFile = path.join(tmpDir, 'screenshot.png');
     config.screenCapture = tmpFile;
 
+    // Run analysis.
+    let results;
     try {
-        const results = await pa11y(url, config);
+        results = await pa11y(url, config);
+    } catch (err) {
+        console.error('Failed to execute pa11y', err);
 
-        // Copy screenshot from temporary directory to final destination.
-        const destFile = path.join(screenshots, fileName);
-        await copyFile(tmpFile, destFile);
+        throw err;
+    }
 
-        const screenPath = `screenshots/${fileName}`;
-        results.screenPath = screenPath;
+    // Copy screenshot to destination.
+    try {
+        const destFile = await adapter.copy(tmpFile);
+        results.screenPath = `screenshots/${destFile}`;
+    } catch (err) {
+        console.error('Failed to copy screenshot', err);
 
+        throw err;
+    } finally {
+        // Cleanup.
+        await unlink(tmpFile);
+        await rmdir(tmpDir);
+    }
+
+    // Generate report.
+    try {
         const html = await htmlReporter.results(results);
 
         return res.send(html);
     } catch (err) {
-        console.error('Failed to execute pa11y', err);
-
-        err.error = 'Please insert a valid url.';
+        console.error('Failed to generate report', err);
 
         throw err;
     }
