@@ -1,66 +1,49 @@
-const pa11y = require('pa11y');
-const config = require('./config.js');
-const _ = require('lodash');
-const htmlReporter = require('./../dist/reporter.js');
+const fs = require('fs');
+const os = require('os');
 const path = require('path');
-
-module.exports = a11ygator;
+const pa11y = require('pa11y');
+const { pa11yConfig, screenshots } = require('./config.js');
+const htmlReporter = require('./../dist/reporter.js');
 
 /**
  * Entry point for a11ygator requests.
  *
- * @param {String} url url to check.
- * @param {Object} options query params from request.
- * @return {Promise}
+ * @param {Express.Request} req Express request.
+ * @param {Express.Response} res Express response.
+ * @return {Promise<Express.Response>}
  */
-async function a11ygator(url, options) {
-    const pa11yConfig = {};
-    // merge base config with query options
-    _.merge(pa11yConfig, config, options)
+exports.report = async (req, res) => {
+    const url = req.query.url;
+    if (!url) {
+        throw new Error('Missing URL');
+    }
 
-    // always make a screenshot
-    const filename = parseFilename(url);
-    const screenPath = `screenshots/${filename}.png`;
-    pa11yConfig.screenCapture = path.resolve(__dirname, `../${screenPath}`);
+    const options = {}; // TODO
+    const config = Object.assign({}, pa11yConfig, options);
 
-    convertBooleans(pa11yConfig);   // parse configuration's boolean-like values
+    // Screenshot configuration.
+    const fileName = `${req.uuid}.png`;
+    const tmpFile = path.join(os.tmpdir(), fileName);
+    config.screenCapture = tmpFile;
 
-    return pa11y(url, pa11yConfig)
-        .then(async function (res){
-            res.screenPath = screenPath;
-            const htmlReport = await htmlReporter.results(res);
-            return Promise.resolve(htmlReport);
-        })
-        .catch((err) => {
-            console.error('Failed to execute pa11y', err);
-            err.error = 'Please insert a valid url.';
-            return Promise.resolve(err);
-        })
-}
+    try {
+        const results = await pa11y(url, config);
 
-/**
- * Convert property values boolean-like strings in booleans.
- *
- * @param {Object} obj the object to parse.
- * @return {void}
- */
-convertBooleans = function(obj) {
-    Object.keys(obj).forEach((key) => {
-        if (obj[key] == 'true') {
-            obj[key] = true;
-        }
-        if (obj[key] == 'false') {
-            obj[key] = false;
-        }
-    });
-}
+        // Copy screenshot from temporary directory to final destination.
+        const destFile = path.join(screenshots, fileName);
+        fs.copyFileSync(tmpFile, destFile);
 
-/**
- * Sobstitute '/' char with '_' in given string.
- *
- * @param {String} url
- * @return {String} modified string
- */
-parseFilename = function(url) {
-    return url.replace(/[/:.]/g, '_');
-}
+        const screenPath = `screenshots/${fileName}`;
+        results.screenPath = screenPath;
+
+        const html = await htmlReporter.results(results);
+
+        return res.send(html);
+    } catch (err) {
+        console.error('Failed to execute pa11y', err);
+
+        err.error = 'Please insert a valid url.';
+
+        throw err;
+    }
+};

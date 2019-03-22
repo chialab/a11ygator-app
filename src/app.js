@@ -1,24 +1,18 @@
 const express = require('express');
-const a11ygator = require('./a11ygator.js');
-const app = express();
-const path = require('path');
+const uuidV4 = require('uuid/v4');
+const { public, screenshots } = require('./config.js');
+const { report } = require('./a11ygator.js');
 
-app.use('/report', async function (req, res) {
-    const url = req.query && req.query.url;
-    if (!url) {
-        res.status(400);
-        return res.send('Missing url');
-    }
+const router = express.Router()
+    .use((req, _, next) => {
+        // Attach UUID to every incoming request.
+        req.uuid = uuidV4();
 
-    const options = req.body || {};
-    if (options.url) {
-        delete options.url;
-    }
+        next();
+    })
+    .get('/report', report)
+    .post('/report', report);
 
-    return a11ygator(url, options).then((result) => res.send(result));
-});
-
-app.use('/screenshots', express.static(path.resolve(__dirname, '../screenshots')));
-app.use('/', express.static(path.resolve(__dirname, '../public')));
-
-module.exports = { app };
+exports.app = express()
+    .use('/screenshots', express.static(screenshots))
+    .use('/', express.static(public), router);

@@ -13,10 +13,11 @@
   "author": "Chialab",
   "license": "MIT",
   "dependencies": {
+    "@google-cloud/storage": "^2.4.3",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
-    "lodash": "^4.17.11",
-    "pa11y": "github:edoardocavazza/pa11y"
+    "pa11y": "github:edoardocavazza/pa11y",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "rollup": "^0.66.2",
