@@ -134,11 +134,11 @@ select:-webkit-autofill:focus {
 }
 
 .form-container button:hover {
-    background-color: #2282c3;
+    background-color: #1b7bbc;
 }
 
 .form-container button:active {
-    background-color: #1e74ad;
+    background-color: #1b7bbc;
 }
 
 .loader {

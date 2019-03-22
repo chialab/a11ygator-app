@@ -22,7 +22,7 @@
 					<div class="button-osx minimize"></div>
 					<div class="button-osx zoom"></div>
 				</div>
-				<img class="screenshot" src="<%= data.screenPath %>"/>
+				<img alt="a screenshot of the tested web page" class="screenshot" src="<%= data.screenPath %>"/>
 			</div>
 			<% } %>
 
