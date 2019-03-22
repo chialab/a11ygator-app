@@ -26,17 +26,21 @@
                 <button type="submit" form="site-form" id="submit-button">Check</button>
             </div>
             <div class="options-container">
-                <label for="standard">Standard:</label>
-                <select name="standard" id="standard">
-                    <optgroup label="Standards">
-                        <option value="WCAG2A">WCAG2A</option>
-                        <option value="WCAG2AA" selected>WCAG2AA</option>
-                        <option value="WCAG2AAA">WCAG2AAA</option>
-                        <option value="Section508">Section508</option>
-                    </optgroup>
-                </select>
-                <label for="wait">Wait time (ms):</label>
-                <input type="number" min="0" value="8000" step="100" size="3" max="10000" id="wait" name="wait" />
+                <div class="option">
+                    <label for="standard">Standard:</label>
+                    <select name="standard" id="standard">
+                        <optgroup label="Standards">
+                            <option value="WCAG2A">WCAG2A</option>
+                            <option value="WCAG2AA" selected>WCAG2AA</option>
+                            <option value="WCAG2AAA">WCAG2AAA</option>
+                            <option value="Section508">Section508</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="option">
+                    <label for="wait">Wait time (ms):</label>
+                    <input type="number" min="0" value="8000" step="100" size="3" max="10000" id="wait" name="wait" />
+                </div>
             </div>
         </form>
     </div>

@@ -189,3 +189,13 @@ select:-webkit-autofill:focus {
 .result-container .pa11y-report .pa11y-page footer .credits {
     display: none;
 }
+
+@media only screen and (max-width: 450px) {
+    .option {
+        margin-bottom: 1em;
+    }
+
+    .site-url-container input {
+        font-size: inherit;
+    }
+  }
