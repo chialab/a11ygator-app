@@ -24,7 +24,7 @@ exports.report = async (req, res) => {
         throw new Error('Missing URL');
     }
 
-    const options = {}; // TODO
+    const options = req.body || {};
     const config = Object.assign({}, pa11yConfig, options);
 
     // Setup temporary file for screenshot.

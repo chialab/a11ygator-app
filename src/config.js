@@ -4,7 +4,7 @@ exports.pa11yConfig = {
     includeNotices: true,
     includeWarnings: true,
     standard: 'WCAG2AAA',
-    wait: 8000,
+    wait: 2000,
     chromeLaunchConfig: {
         args: [
             '--no-sandbox',

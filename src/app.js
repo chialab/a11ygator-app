@@ -4,6 +4,7 @@ const { report } = require('./a11ygator.js');
 const adapter  = require('./screenshots/index.js');
 
 const router = express.Router()
+    .use(express.json())
     .get('/report', report)
     .post('/report', report);
 
