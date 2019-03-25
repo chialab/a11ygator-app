@@ -13,7 +13,10 @@
 
 		<div class="pa11y-page">
 
-			<h1>Accessibility report for <a href="<%= data.pageUrl %>" target="_blank"><%= data.documentTitle %></a></h1>
+            <div class="report-title-container">
+			    <h1>Accessibility report for <a href="<%= data.pageUrl %>" target="_blank"><%= data.documentTitle %></a></h1>
+                <a class="download-report" href="data: text/json;charset=utf-8," + %= encodeURIComponent(JSON.stringify(report)) % download="report.json">Download</a>
+            </div>
 
 			<% if (data.screenPath) { %>
 			<div class="screenshot-container">
