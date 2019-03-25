@@ -18,7 +18,13 @@ sendData = async function (ev) {
 
     resultContainer.innerHTML = `<div class="loader"></div>`;
 
-    fetch(`report?url=${url}`)
+    fetch(`report?url=${url}`, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        body: JSON.stringify(options),
+    })
         .then((res) => {
             if (res.ok) {
                 return res.text()

@@ -8,15 +8,17 @@
   "scripts": {
     "start": "node server.js",
     "build": "rollup src/reporter/index.js --name 'Reporter' --file dist/reporter.js --config",
+    "docker": "docker build -t chialab/a11ygator .",
     "package": "yarn run build && rm gcp.zip && zip -ro gcp.zip package.json dist public screenshots/.gitkeep src"
   },
   "author": "Chialab",
   "license": "MIT",
   "dependencies": {
+    "@google-cloud/storage": "^2.4.3",
     "body-parser": "^1.18.3",
     "express": "^4.16.3",
-    "lodash": "^4.17.11",
-    "pa11y": "github:edoardocavazza/pa11y"
+    "pa11y": "github:edoardocavazza/pa11y",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "rollup": "^0.66.2",

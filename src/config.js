@@ -1,8 +1,10 @@
-module.exports = {
+const path = require('path');
+
+exports.pa11yConfig = {
     includeNotices: true,
     includeWarnings: true,
     standard: 'WCAG2AAA',
-    wait: 8000,
+    wait: 2000,
     chromeLaunchConfig: {
         args: [
             '--no-sandbox',
@@ -17,3 +19,7 @@ module.exports = {
         info: console.info,
     },
 };
+
+exports.public = path.resolve(__dirname, '..', 'public');
+
+exports.screenshots = path.resolve(__dirname, '..', 'screenshots');

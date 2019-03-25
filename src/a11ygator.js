@@ -1,66 +1,69 @@
-const pa11y = require('pa11y');
-const config = require('./config.js');
-const _ = require('lodash');
-const htmlReporter = require('./../dist/reporter.js');
+const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const util = require('util');
+const pa11y = require('pa11y');
+const { pa11yConfig } = require('./config.js');
+const adapter = require('./screenshots/index.js');
+const htmlReporter = require('./../dist/reporter.js');
 
-module.exports = a11ygator;
+const mkdtemp = util.promisify(fs.mkdtemp);
+const rmdir = util.promisify(fs.rmdir);
+const unlink = util.promisify(fs.unlink);
 
 /**
  * Entry point for a11ygator requests.
  *
- * @param {String} url url to check.
- * @param {Object} options query params from request.
- * @return {Promise}
+ * @param {Express.Request} req Express request.
+ * @param {Express.Response} res Express response.
+ * @return {Promise<Express.Response>}
  */
-async function a11ygator(url, options) {
-    const pa11yConfig = {};
-    // merge base config with query options
-    _.merge(pa11yConfig, config, options)
+exports.report = async (req, res) => {
+    const url = req.query.url;
+    if (!url) {
+        throw new Error('Missing URL');
+    }
 
-    // always make a screenshot
-    const filename = parseFilename(url);
-    const screenPath = `screenshots/${filename}.png`;
-    pa11yConfig.screenCapture = path.resolve(__dirname, `../${screenPath}`);
+    const options = req.body || {};
+    const config = Object.assign({}, pa11yConfig, options);
 
-    convertBooleans(pa11yConfig);   // parse configuration's boolean-like values
+    // Setup temporary file for screenshot.
+    const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'a11ygator-'));
+    const tmpFile = path.join(tmpDir, 'screenshot.png');
+    config.screenCapture = tmpFile;
 
-    return pa11y(url, pa11yConfig)
-        .then(async function (res){
-            res.screenPath = screenPath;
-            const htmlReport = await htmlReporter.results(res);
-            return Promise.resolve(htmlReport);
-        })
-        .catch((err) => {
-            console.error('Failed to execute pa11y', err);
-            err.error = 'Please insert a valid url.';
-            return Promise.resolve(err);
-        })
-}
+    // Run analysis.
+    let results;
+    try {
+        results = await pa11y(url, config);
+    } catch (err) {
+        console.error('Failed to execute pa11y', err);
 
-/**
- * Convert property values boolean-like strings in booleans.
- *
- * @param {Object} obj the object to parse.
- * @return {void}
- */
-convertBooleans = function(obj) {
-    Object.keys(obj).forEach((key) => {
-        if (obj[key] == 'true') {
-            obj[key] = true;
-        }
-        if (obj[key] == 'false') {
-            obj[key] = false;
-        }
-    });
-}
+        throw err;
+    }
 
-/**
- * Sobstitute '/' char with '_' in given string.
- *
- * @param {String} url
- * @return {String} modified string
- */
-parseFilename = function(url) {
-    return url.replace(/[/:.]/g, '_');
-}
+    // Copy screenshot to destination.
+    try {
+        const destFile = await adapter.copy(tmpFile);
+        results.screenPath = `screenshots/${destFile}`;
+    } catch (err) {
+        console.error('Failed to copy screenshot', err);
+
+        throw err;
+    } finally {
+        // Cleanup.
+        await unlink(tmpFile);
+        await rmdir(tmpDir);
+    }
+
+    // Generate report.
+    try {
+        const html = await htmlReporter.results(results);
+
+        return res.send(html);
+    } catch (err) {
+        console.error('Failed to generate report', err);
+
+        throw err;
+    }
+};
