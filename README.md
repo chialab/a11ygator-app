@@ -1,4 +1,4 @@
-# a11ygator
+# A11ygator
 
 A web dashboard for accessibility tests.
 
@@ -17,7 +17,7 @@ In local environment, navigate with the browser to **`https://localhost:3000/`**
 
 ## API Usage
 
-It is also possible to directly use `a11ygator` without filling the form.
+It is also possible to directly use `A11ygator` without filling the form.
 
 To get an HTML report with default options, make a GET call to
 
