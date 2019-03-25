@@ -2,18 +2,20 @@
 
 A web dashboard for accessibility tests.
 
-## Start the server
+![homepage screenshot](a11ygator.png?raw=true "Title")
+
+## Awake the A11ygator
+
+Run the server
 
 ```.sh
 yarn install
 yarn start
 ```
 
-## App Usage
+In local environment, navigate with the browser to **`https://localhost:3000/`** in order to visualize the app.
 
-In local environment, navigate with the browser to **`https://localhost:3000/`** in order to visualize the app home page.
-
-### API Usage
+## API Usage
 
 It is also possible to directly use `a11ygator` without filling the form.
 
@@ -37,6 +39,17 @@ Content-Type: application/json
     "wait": 10000,
     // ...
 }
+```
+
+## Development
+
+Same commands used to run the server.
+At the moment, every time we want to modify the `reporter`, we first have to build it in order to see our modifies:
+
+```.sh
+    yarn build
+    yarn install
+    yarn start
 ```
 
 See https://github.com/pa11y/pa11y more info.
