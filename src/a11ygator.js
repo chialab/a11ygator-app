@@ -60,7 +60,13 @@ exports.report = async (req, res) => {
     try {
         const html = await htmlReporter.results(results);
 
-        return res.send(html);
+        return res
+            .set({
+                'Expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
+                'Last-Modified': (new Date()).toGMTString(),
+                'Cache-Control': 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
+            })
+            .send(html);
     } catch (err) {
         console.error('Failed to generate report', err);
 

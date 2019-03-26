@@ -53,7 +53,7 @@ class LocalAdapter extends BaseAdapter {
      * @inheritdoc
      */
     getMiddleware() {
-        return express.static(this.options.path);
+        return express.static(this.options.path, { immutable: true, maxAge: '1y' });
     }
 };
 

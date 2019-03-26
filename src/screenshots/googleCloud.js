@@ -65,14 +65,24 @@ class GoogleCloudAdapter extends BaseAdapter {
         const middleware = async (req, res, next) => {
             const filePath = path.join(this.options.path, req.path.substr(1));
 
+            const now = new Date();
+            const expires = new Date(now.valueOf() + this.options.validity * 1000);
+
             try {
                 const file = this.bucket.file(filePath);
                 const [ url ] = await file.getSignedUrl({
                     action: 'read',
-                    expires: Date.now() + this.options.validity,
+                    expires,
                 });
 
-                res.redirect(url, 302);
+                res
+                    .set({
+                        'Date': now.toGMTString(),
+                        'Last-Modified': now.toGMTString(),
+                        'Expires': expires.toGMTString(),
+                        'Cache-Control': `private, expires=${this.options.validity}, must-revalidate`,
+                    })
+                    .redirect(url, 302);
             } catch (err) {
                 console.error('Unable to obtain signed URL', err);
 
