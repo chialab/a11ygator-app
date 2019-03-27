@@ -32,6 +32,7 @@ sendData = async function (ev) {
                         const parser = new DOMParser();
                         const htmlDocument = parser.parseFromString(htmlRes, "text/html");
                         const reportElement = htmlDocument.querySelector('.pa11y-report');
+                        resultContainer.innerHTML = reportElement.outerHTML;
                     });
             }
             res.text().then((text) => {
