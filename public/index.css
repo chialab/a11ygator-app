@@ -114,8 +114,8 @@ textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-  -webkit-text-fill-color: currentColor;
-  transition: background-color 5000s ease-in-out 0s;
+    -webkit-text-fill-color: currentColor;
+    transition: background-color 5000s ease-in-out 0s;
 }
 
 /* check button */
@@ -198,4 +198,4 @@ select:-webkit-autofill:focus {
     .site-url-container input {
         font-size: inherit;
     }
-  }
+}

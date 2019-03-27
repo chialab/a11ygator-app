@@ -1,4 +1,4 @@
-const missingUrlErrorMessage = (error) => `<div class="error">${error}</div>`;
+const errorMessage = (error) => `<div class="error">${error || ''}</div>`;
 
 sendData = async function (ev) {
     ev.preventDefault();
@@ -16,7 +16,7 @@ sendData = async function (ev) {
 
     const resultContainer = document.querySelector('.result-container');
 
-    resultContainer.innerHTML = `<div class="loader"></div>`;
+    resultContainer.innerHTML = '<div class="loader"></div>';
 
     fetch(`report?url=${url}`, {
         headers: {
@@ -32,15 +32,13 @@ sendData = async function (ev) {
                         const parser = new DOMParser();
                         const htmlDocument = parser.parseFromString(htmlRes, "text/html");
                         const reportElement = htmlDocument.querySelector('.pa11y-report');
-                        resultContainer.innerHTML = reportElement.outerHTML;
-                    })
+                    });
             }
-            return res.json()
-                .then((jsonRes) => {
-                    if (htmlRes.error) {
-                        resultContainer.innerHTML = missingUrlErrorMessage(jsonRes.error);
-                        return;
-                    }
-                });
+            res.text().then((text) => {
+                resultContainer.innerHTML = errorMessage(text);
+            });
+        })
+        .catch((err) => {
+            resultContainer.innerHTML = errorMessage(err);
         });
 }

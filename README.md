@@ -10,6 +10,7 @@ Run the server
 
 ```.sh
 yarn install
+yarn build
 yarn start
 ```
 
@@ -25,7 +26,7 @@ To get an HTML report with default options, make a GET call to
 GET /report?url=<site-to-test> HTTP/1.1
 ```
 
-To pass options, please make a POST call embedding them on the body request.
+To pass options, make a POST call embedding them on the request's body.
 
 Example:
 
@@ -41,16 +42,4 @@ Content-Type: application/json
 }
 ```
 
-## Development
-
-Same commands used to run the server.
-At the moment, every time we want to modify the `reporter`, we first have to build it in order to see our modifies:
-
-```.sh
-    yarn build
-    yarn install
-    yarn start
-```
-
-See https://github.com/pa11y/pa11y more info.
-
+See https://github.com/pa11y/pa11y for more info.
