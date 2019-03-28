@@ -3,7 +3,7 @@
 </p>
 <h1 align="center">A11ygator</h1>
 <p align="center">
-    <a href="https://www.w3.org/WAI/standards-guidelines/wcag/">WCAG home</a> |
+    <a href="https://www.w3.org/WAI/standards-guidelines/wcag/">WCAG</a> |
     <a href="https://www.chialab.io">Authors</a>
 </p>
 
@@ -11,7 +11,7 @@ Validate the accessibility of your website against W3C's Web Content Accessibili
 
 A11ygator is a free tool for web developers to check compliance with the WCAG rules.
 
-Simply put an URL and choose the WCAG standard.
+Simply type an URL and choose the WCAG standard.
 
 ![homepage screenshot](a11ygator.png?raw=true "homepage screenshot")
 
@@ -19,8 +19,8 @@ Simply put an URL and choose the WCAG standard.
 
 Requirements
 
-* [Node JS](https://nodejs.org/) (>= 11.11.0)
-* [Yarn](https://yarnpkg.com/) (>= 1.15.0)
+* [Node JS](https://nodejs.org/) (>= 8.0.0)
+* [Yarn](https://yarnpkg.com/)
 
 Run the server
 
