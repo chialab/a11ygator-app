@@ -62,3 +62,7 @@ Also check out A11ygator extensions:
 ## Credits
 
 A11ygator uses [Pa11y](https://github.com/pa11y/pa11y) under the hood.
+
+## License
+
+A11ygator is released under the [MIT](./LICENSE) license.
