@@ -24,7 +24,7 @@ exports.app = express()
         }
 
         let errorTemplate = `<div>
-            <h3>Whoops! Something went wrong with your request.</h3>
+            <h3>Whoops! For some reasons, I can not reach this url... Are you sure it is correct?</h3>
         </div>`;
 
         res.send(errorTemplate);
