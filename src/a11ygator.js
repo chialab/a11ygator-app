@@ -27,8 +27,7 @@ exports.report = async (req, res, next) => {
         return;
     }
 
-    const options = req.body || {};
-    const config = Object.assign({}, pa11yConfig, options);
+    const config = buildConfig(req.body);
 
     // Setup temporary file for screenshot.
     const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'a11ygator-'));
@@ -75,4 +74,25 @@ exports.report = async (req, res, next) => {
 
         return;
     }
+};
+
+/**
+ * Do some transformation to raw config.
+ * Take only `wait` and `timeout` from rawConfig.
+ * Take default values if external ones exceed them.
+ *
+ * @param {Object} rawConfig
+ * @return {Object} Refined config object.
+ */
+buildConfig = (rawConfig) => {
+    if (!rawConfig) {
+        return pa11yConfig;
+    }
+
+    let { timeout, wait } = rawConfig;
+
+    timeout = Math.min(parseInt(timeout) || pa11yConfig.timeout, pa11yConfig.timeout);
+    wait = Math.min(parseInt(wait) || pa11yConfig.wait, pa11yConfig.wait);
+
+    return Object.assign({}, pa11yConfig, { timeout, wait });
 };
