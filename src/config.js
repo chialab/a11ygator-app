@@ -1,10 +1,14 @@
 const path = require('path');
 
+const wait = 8000;
+const timeout = 10000;
+
 exports.pa11yConfig = {
     includeNotices: true,
     includeWarnings: true,
     standard: 'WCAG2AAA',
-    wait: 2000,
+    wait,
+    timeout,
     chromeLaunchConfig: {
         args: [
             '--no-sandbox',

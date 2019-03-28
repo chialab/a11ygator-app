@@ -4,6 +4,7 @@ const path = require('path');
 const util = require('util');
 const pa11y = require('pa11y');
 const { pa11yConfig } = require('./config.js');
+const AppError = require('./appError.js');
 const adapter = require('./screenshots/index.js');
 const htmlReporter = require('./../dist/reporter.js');
 
@@ -16,16 +17,17 @@ const unlink = util.promisify(fs.unlink);
  *
  * @param {Express.Request} req Express request.
  * @param {Express.Response} res Express response.
- * @return {Promise<Express.Response>}
+ * @return {Promise<void>}
  */
-exports.report = async (req, res) => {
+exports.report = async (req, res, next) => {
     const url = req.query.url;
     if (!url) {
-        throw new Error('Missing URL');
+        next(new AppError('Missing URL', 400));
+
+        return;
     }
 
-    const options = req.body || {};
-    const config = Object.assign({}, pa11yConfig, options);
+    const config = buildConfig(req.body);
 
     // Setup temporary file for screenshot.
     const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'a11ygator-'));
@@ -37,9 +39,9 @@ exports.report = async (req, res) => {
     try {
         results = await pa11y(url, config);
     } catch (err) {
-        console.error('Failed to execute pa11y', err);
+        next(new AppError('Failed to execute Pa11y', 400, err));
 
-        throw err;
+        return;
     }
 
     // Copy screenshot to destination.
@@ -47,9 +49,9 @@ exports.report = async (req, res) => {
         const destFile = await adapter.copy(tmpFile);
         results.screenPath = `screenshots/${destFile}`;
     } catch (err) {
-        console.error('Failed to copy screenshot', err);
+        next(new AppError('Failed to copy screenshot', 504, err));
 
-        throw err;
+        return;
     } finally {
         // Cleanup.
         await unlink(tmpFile);
@@ -68,8 +70,29 @@ exports.report = async (req, res) => {
             })
             .send(html);
     } catch (err) {
-        console.error('Failed to generate report', err);
+        next(new AppError('Failed to generate report', 500, err));
 
-        throw err;
+        return;
     }
+};
+
+/**
+ * Do some transformation to raw config.
+ * Take only `wait` and `timeout` from rawConfig.
+ * Take default values if external ones exceed them.
+ *
+ * @param {Object} rawConfig
+ * @return {Object} Refined config object.
+ */
+buildConfig = (rawConfig) => {
+    if (!rawConfig) {
+        return pa11yConfig;
+    }
+
+    let { timeout, wait } = rawConfig;
+
+    timeout = Math.min(parseInt(timeout) || pa11yConfig.timeout, pa11yConfig.timeout);
+    wait = Math.min(parseInt(wait) || pa11yConfig.wait, pa11yConfig.wait);
+
+    return Object.assign({}, pa11yConfig, { timeout, wait });
 };

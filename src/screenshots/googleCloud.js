@@ -1,6 +1,7 @@
 const path = require('path');
 const { Storage } = require('@google-cloud/storage');
 const uuidv4 = require('uuid/v4');
+const AppError = require('../appError.js');
 const BaseAdapter = require('./base.js');
 
 /** @typedef {{ bucket: string, path?: string, validity?: number }} GoogleCloudAdapterOptions */
@@ -84,9 +85,7 @@ class GoogleCloudAdapter extends BaseAdapter {
                     })
                     .redirect(url, 302);
             } catch (err) {
-                console.error('Unable to obtain signed URL', err);
-
-                next();
+                next(new AppError('Unable to obtain signed URL', 504, err));
             }
         };
 

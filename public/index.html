@@ -17,13 +17,11 @@
         </div>
     </header>
     <div class="container form-container">
-        <p>
-            Validate your Web Site with A11ygator:
-        </p>
+        <p>Validate your Web Site with A11ygator:</p>
         <form id="site-form" onsubmit="sendData(event)" method="POST">
             <div class="site-url-container">
-                <input type="text" aria-label="the web url to validate" name="url" placeholder="https://www.google.com" required>
-                <button aria-label="check site' type="submit" form="site-form" id="submit-button">Check</button>
+                <input type="url" aria-label="the web url to validate" name="url" placeholder="https://www.google.com" required>
+                <button aria-label="check site" type="submit" form="site-form" id="submit-button">Check</button>
             </div>
             <div class="options-container">
                 <div class="option">
@@ -39,7 +37,7 @@
                 </div>
                 <div class="option">
                     <label for="wait">Wait time (ms):</label>
-                    <input type="number" min="0" value="2000" step="100" size="3" max="10000" id="wait" name="wait" />
+                    <input type="number" min="0" value="2000" step="100" max="8000" id="wait" name="wait" />
                 </div>
             </div>
         </form>
