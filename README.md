@@ -1,10 +1,26 @@
-# A11ygator
+<p align="center">
+    <img src="public/logo.png" width="100">
+</p>
+<h1 align="center">A11ygator</h1>
+<p align="center">
+    <a href="https://www.w3.org/WAI/standards-guidelines/wcag/">WCAG home</a> |
+    <a href="https://www.chialab.io">Authors</a>
+</p>
 
-A web dashboard for accessibility tests.
+Validate the accessibility of your website against W3C's Web Content Accessibility Guidelines.
 
-![homepage screenshot](a11ygator.png?raw=true "Title")
+A11ygator is a free tool for web developers to check compliance with the WCAG rules.
+
+Simply put an URL and choose the WCAG standard.
+
+![homepage screenshot](a11ygator.png?raw=true "homepage screenshot")
 
 ## Awake the A11ygator
+
+Requirements
+
+* [Node JS](https://nodejs.org/) (>= 11.11.0)
+* [Yarn](https://yarnpkg.com/) (>= 1.15.0)
 
 Run the server
 
@@ -14,7 +30,7 @@ yarn build
 yarn start
 ```
 
-In local environment, navigate with the browser to **`https://localhost:3000/`** in order to visualize the app.
+In local environment, navigate with the browser to **`https://localhost:3000/`** to visualize the app.
 
 ## API Usage
 
@@ -33,13 +49,16 @@ Example:
 ```http
 POST /report?url=<site-to-test> HTTP/1.1
 Content-Type: application/json
-
 {
-    "includeNotices": false,
-    "includeWarnings": false,
-    "wait": 10000,
-    // ...
+    "wait": 5000,
+    "timeout": 8000
 }
 ```
 
-See https://github.com/pa11y/pa11y for more info.
+Also check out A11ygator extensions:
+* <a href="https://chrome.google.com/webstore/detail/a11ygator/imfmlpemomjmfncnmkjdeeinbkichaio">A11ygator for Chrome</a>
+* <a href="https://addons.mozilla.org/it/firefox/addon/a11ygator">A11ygator for Firefox</a>
+
+## Credits
+
+A11ygator uses [Pa11y](https://github.com/pa11y/pa11y) under the hood.
