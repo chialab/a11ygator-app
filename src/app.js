@@ -18,15 +18,13 @@ exports.app = express()
         }
 
         if (err instanceof AppError) {
-            console.error(err.message, err.previous);
+            console.error(`${err.status} - ${err.message}`, err.previous);
 
             res.status(err.status);
         }
 
         let errorTemplate = `<div>
             <h3>Whoops! Something went wrong with your request.</h3>
-            <p>${err.status} - ${err.message}</p>
-            <p>${err.previous}</p>
         </div>`;
 
         res.send(errorTemplate);

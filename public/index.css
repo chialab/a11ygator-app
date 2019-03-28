@@ -120,10 +120,8 @@ select:-webkit-autofill:focus {
 
 /* check button */
 .form-container button {
-    width: 8rem;
-    max-width: 1000%;
-    height: 2.5rem;
     color: #fff;
+    padding: 0.75em 1em;
     font-size: 1em;
     background-color: #42513f;
     border: 0;
