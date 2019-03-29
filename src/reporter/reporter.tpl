@@ -39,6 +39,11 @@
 						}
 						return 0;
 					});
+
+                if (!issues.length) { %>
+                     <h1>🎉Hurray! I have found no problems with your website. Now you are ready for a <b>real</b> accessibility test by human beings!</h1>
+                <% }
+
 				for (let i = 0; i < issues.length; i++) {
 					let issue = issues[i]; %>
 				<li class="result <%= issue.type %>" data-selector="<%= issue.selector %>">
@@ -48,7 +53,6 @@
 				</li>
 				<% } %>
 			</ul>
-
 			<hr />
 
 			<footer>

@@ -8,6 +8,7 @@ report.supports = '^5.0.0 || ^5.0.0-alpha || ^5.0.0-beta';
 
 // Compile template and output formatted results
 report.results = async results => {
+
     return template({
 
         css: templateCSS,
