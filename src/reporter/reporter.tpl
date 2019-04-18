@@ -40,7 +40,7 @@
 						return 0;
 					});
 
-                if (!issues.length) { %>
+                if (data.issues.length === 0) { %>
                      <h1>🎉Hurray! I have found no problems with your website. Now you are ready for a <b>real</b> accessibility test by human beings!</h1>
                 <% }
 
