@@ -39,18 +39,8 @@ Resources:
             Principal:
               Service: 'lambda.amazonaws.com'
             Action: 'sts:AssumeRole'
-      Policies:
-        - PolicyName: 'Lambda'
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Sid: 'WriteCloudWatchLogs'
-                Effect: 'Allow'
-                Action:
-                  - 'logs:CreateLogGroup'
-                  - 'logs:CreateLogStream'
-                  - 'logs:PutLogEvents'
-                Resource: '*'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
   TwitterCrcFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
@@ -83,26 +73,16 @@ Resources:
             Principal:
               Service: 'lambda.amazonaws.com'
             Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
       Policies:
-        - PolicyName: 'Lambda'
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Sid: 'WriteCloudWatchLogs'
-                Effect: 'Allow'
-                Action:
-                  - 'logs:CreateLogGroup'
-                  - 'logs:CreateLogStream'
-                  - 'logs:PutLogEvents'
-                Resource: '*'
         - PolicyName: 'SQS'
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
               - Sid: 'EnqueueTweets'
                 Effect: 'Allow'
-                Action:
-                  - 'sqs:SendMessage'
+                Action: 'sqs:SendMessage'
                 Resource: !GetAtt 'TweetsQueue.Arn'
   TwitterWebhookFunction:
     Type: 'AWS::Lambda::Function'
