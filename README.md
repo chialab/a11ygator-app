@@ -20,7 +20,7 @@ Simply type an URL and choose the WCAG standard.
 ![homepage screenshot](a11ygator.png?raw=true "homepage screenshot")
 
 
-🚀Now available also as Browser Extension! Check out <a href="https://chrome.google.com/webstore/detail/a11ygator/imfmlpemomjmfncnmkjdeeinbkichaio">A11ygator for Chrome</a> and <a href="https://addons.mozilla.org/it/firefox/addon/a11ygator">A11ygator for Firefox</a>.
+🚀Now also available as Browser Extension! Check out <a href="https://chrome.google.com/webstore/detail/a11ygator/imfmlpemomjmfncnmkjdeeinbkichaio">A11ygator for Chrome</a> and <a href="https://addons.mozilla.org/it/firefox/addon/a11ygator">A11ygator for Firefox</a>.
 
 
 ## Awake the A11ygator
@@ -62,6 +62,10 @@ Content-Type: application/json
     "timeout": 8000
 }
 ```
+
+## More
+
+Also check out [A11ygator Extension repository](https://github.com/chialab/a11ygator-extension).
 
 ## Credits
 
