@@ -23,6 +23,9 @@ Outputs:
     Value: !Sub 'https://${Api}.execute-api.${AWS::Region}.amazonaws.com/prod/webhook/twitter'
 
 Resources:
+  TweetsQueue:
+    Type: 'AWS::SQS::Queue'
+
   ###########################################################
   ### Function to handle Twitter Challenge Response Check ###
   ###########################################################
@@ -92,6 +95,15 @@ Resources:
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
                 Resource: '*'
+        - PolicyName: 'SQS'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: 'EnqueueTweets'
+                Effect: 'Allow'
+                Action:
+                  - 'sqs:SendMessage'
+                Resource: !GetAtt 'TweetsQueue.Arn'
   TwitterWebhookFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
@@ -99,6 +111,7 @@ Resources:
       Description: !Sub 'Handle Twitter webhook events for ${AWS::StackName}.'
       Environment:
         Variables:
+          SQS_QUEUE: !Ref 'TweetsQueue'
           CONSUMER_SECRET: !Ref 'ConsumerSecret'
       Handler: 'index.handler'
       Role: !GetAtt 'TwitterWebhookRole.Arn'

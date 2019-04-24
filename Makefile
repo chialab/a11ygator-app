@@ -1,10 +1,18 @@
-all: package
+all: deploy
 
+STACK_NAME := A11ygatorBot
 PACKAGE_TEMPLATE := template.yml
 PACKAGE_BUCKET ?= chialab-cloudformation-templates
 PACKAGE_PREFIX ?= chialab/a11ygator-bot
 
-package:
+deploy: package
+	aws cloudformation deploy \
+		--template-file template.yml \
+		--stack-name $(STACK_NAME) \
+		--capabilities CAPABILITY_IAM \
+		--profile chialab
+
+package: validate
 	aws cloudformation package \
 		--template-file templates/root.yml \
 		--output-template-file $(PACKAGE_TEMPLATE) \
