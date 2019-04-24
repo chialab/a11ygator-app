@@ -39,7 +39,6 @@ header a {
     font-size: 1em;
     border: none;
     border-bottom: 1px solid black;
-    outline: none;
     transition: box-shadow .4s, -webkit-box-shadow .4s, border .4s;
 }
 
@@ -91,7 +90,6 @@ header a {
     border: none;
     border-bottom: 1px solid black;
     border-radius: 0;
-    outline: none;
     cursor: pointer;
     transition: box-shadow .4s, -webkit-box-shadow .4s, border .4s;
     -webkit-appearance: none;
@@ -126,7 +124,6 @@ select:-webkit-autofill:focus {
     background-color: #42513f;
     border: 0;
     border-radius: 2px;
-    outline: none;
     cursor: pointer;
     transition: all 150ms ease-out;
 }
@@ -163,7 +160,6 @@ select:-webkit-autofill:focus {
 .result-container {
     display: block;
     position: relative;
-    margin-top: 2rem;
     padding-top: 4rem;
 }
 
@@ -196,4 +192,23 @@ select:-webkit-autofill:focus {
     .site-url-container input {
         font-size: inherit;
     }
+}
+
+.signature {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.signature a {
+    text-decoration: none;
+    color: black;
+}
+
+.signature span {
+    margin-right: .5em;
+}
+
+.signature svg {
+    height: 1em;
+    width: 1.5em;
 }
