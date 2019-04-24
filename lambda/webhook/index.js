@@ -67,13 +67,14 @@ exports.handler = async (event) => {
       return mentions.some((elem) => elem.id_str === currentUserId);
     });
 
-    return Promise.all(tweets.map((tweet) => {
-      const params = {
+    const params = {
+      QueueUrl: process.env.SQS_QUEUE,
+      Entries: tweets.map((tweet) => ({
+        Id: tweet.id_str,
         MessageBody: JSON.stringify(tweet),
-        QueueUrl: process.env.SQS_QUEUE,
-      };
-      return SQS.sendMessage(params).promise();
-    }))
+      })),
+    };
+    return SQS.sendMessageBatch(params).promise()
       .then(() => ({ statusCode: 204}))
       .catch((err) => {
         console.error(err);
