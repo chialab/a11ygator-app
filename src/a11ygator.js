@@ -84,7 +84,7 @@ exports.report = async (req, res, next) => {
  * @param {Object} rawConfig
  * @return {Object} Refined config object.
  */
-buildConfig = (rawConfig) => {
+const buildConfig = (rawConfig) => {
     if (!rawConfig) {
         return pa11yConfig;
     }
