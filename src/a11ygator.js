@@ -28,11 +28,7 @@ exports.report = async (req, res, next) => {
     }
 
     const config = buildConfig(req.body);
-
-    // Setup temporary file for screenshot.
-    const tmpDir = await mkdtemp(path.join(os.tmpdir(), 'a11ygator-'));
-    const tmpFile = path.join(tmpDir, 'screenshot.png');
-    config.screenCapture = tmpFile;
+    config.screenCapture = true;
 
     // Run analysis.
     let results;
@@ -46,16 +42,12 @@ exports.report = async (req, res, next) => {
 
     // Copy screenshot to destination.
     try {
-        const destFile = await adapter.copy(tmpFile);
+        const destFile = await adapter.write(results.screenshot);
         results.screenPath = `screenshots/${destFile}`;
     } catch (err) {
-        next(new AppError('Failed to copy screenshot', 504, err));
+        next(new AppError('Failed to write screenshot', 504, err));
 
         return;
-    } finally {
-        // Cleanup.
-        await unlink(tmpFile);
-        await rmdir(tmpDir);
     }
 
     // Generate report.

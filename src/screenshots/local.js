@@ -4,8 +4,8 @@ const util = require('util');
 const express = require('express');
 const uuidv4 = require('uuid/v4');
 const BaseAdapter = require('./base.js');
-const { screenshots } = require('../config.js');
 
+const writeFile = util.promisify(fs.writeFile);
 const copyFile = util.promisify(fs.copyFile);
 
 /** @typedef {{ path?: string }} LocalAdapterOptions */
@@ -45,6 +45,18 @@ class LocalAdapter extends BaseAdapter {
         const destFile = path.join(this.options.path, fileName);
 
         await copyFile(tmpFile, destFile);
+
+        return fileName;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    async write(contents) {
+        const fileName = `${uuidv4()}${path.extname(tmpFile)}`;
+        const destFile = path.join(this.options.path, fileName);
+
+        await writeFile(destFile, contents);
 
         return fileName;
     }
