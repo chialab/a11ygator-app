@@ -34,6 +34,10 @@ class BaseAdapter {
         throw new Error('Not implemented');
     }
 
+    write(contents) {
+        throw new Error('Not implemented');
+    }
+
     /**
      * Get Express middleware to serve screenshots.
      *

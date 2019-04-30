@@ -1,7 +1,8 @@
 const path = require('path');
 
-const wait = 8000;
-const timeout = 10000;
+const timeoutSec = process.env.FUNCTION_TIMEOUT_SEC ? (parseInt(process.env.FUNCTION_TIMEOUT_SEC, 10) - 1) : 10;
+const timeout = timeoutSec * 1000;
+const wait = Math.round(timeout * .75);
 
 exports.pa11yConfig = {
     includeNotices: true,

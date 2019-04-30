@@ -54,6 +54,18 @@ class GoogleCloudAdapter extends BaseAdapter {
     /**
      * @inheritdoc
      */
+    async write(contents, extension = '.png') {
+        const fileName = `${uuidv4()}${extension}`;
+        const destination = path.join(this.options.path, fileName);
+
+        await this.bucket.file(destination).save(contents);
+
+        return destination;
+    }
+
+    /**
+     * @inheritdoc
+     */
     getMiddleware() {
         /**
          * Redirect to Google Cloud Storage file.
