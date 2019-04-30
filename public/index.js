@@ -18,7 +18,7 @@ sendData = async function (ev) {
 
     resultContainer.innerHTML = '<div class="loader"></div>';
 
-    fetch(`report?url=${url}`, {
+    fetch(`report?url=${encodeURIComponent(url)}&format=html`, {
         headers: {
             'Content-Type': 'application/json',
         },
