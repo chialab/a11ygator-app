@@ -43,6 +43,7 @@ exports.report = async (req, res, next) => {
     // Copy screenshot to destination.
     try {
         const destFile = await adapter.write(results.screenshot);
+        delete results.screenshot;
         results.screenPath = `screenshots/${destFile}`;
     } catch (err) {
         next(new AppError('Failed to write screenshot', 504, err));
@@ -52,7 +53,19 @@ exports.report = async (req, res, next) => {
 
     // Generate report.
     try {
-        const html = await htmlReporter.results(results);
+
+        if (req.query.format === 'html') {
+            const html = await htmlReporter.results(results);
+
+            return res
+                .set({
+                    'Expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
+                    'Last-Modified': (new Date()).toGMTString(),
+                    'Cache-Control': 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
+                })
+                .send(html);
+        }
+
 
         return res
             .set({
@@ -60,7 +73,7 @@ exports.report = async (req, res, next) => {
                 'Last-Modified': (new Date()).toGMTString(),
                 'Cache-Control': 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
             })
-            .send(html);
+            .send(results);
     } catch (err) {
         next(new AppError('Failed to generate report', 500, err));
 

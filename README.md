@@ -44,10 +44,16 @@ In local environment, navigate with the browser to **`https://localhost:3000/`**
 
 It is also possible to directly use `A11ygator` without filling the form.
 
-To get an HTML report with default options, make a GET call to
+To get a raw JSON report with default options, make a GET call to
 
 ```http
 GET /report?url=<site-to-test> HTTP/1.1
+```
+
+To get an HTML report just add query param 'format'
+
+```http
+GET /report?url=<site-to-test&format=html> HTTP/1.1
 ```
 
 To pass options, make a POST call embedding them on the request's body.
