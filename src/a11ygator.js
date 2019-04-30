@@ -1,16 +1,8 @@
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const util = require('util');
 const pa11y = require('pa11y');
 const { pa11yConfig } = require('./config.js');
 const AppError = require('./appError.js');
 const adapter = require('./screenshots/index.js');
 const htmlReporter = require('./../dist/reporter.js');
-
-const mkdtemp = util.promisify(fs.mkdtemp);
-const rmdir = util.promisify(fs.rmdir);
-const unlink = util.promisify(fs.unlink);
 
 /**
  * Entry point for a11ygator requests.
@@ -53,26 +45,20 @@ exports.report = async (req, res, next) => {
 
     // Generate report.
     try {
+        res.set({
+            'Expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
+            'Last-Modified': (new Date()).toGMTString(),
+            'Cache-Control': 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
+        });
 
         if (req.query.format === 'html') {
             const html = await htmlReporter.results(results);
 
-            return res
-                .set({
-                    'Expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
-                    'Last-Modified': (new Date()).toGMTString(),
-                    'Cache-Control': 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
-                })
-                .send(html);
+            return res.send(html);
         }
 
-
         return res
-            .set({
-                'Expires': 'Mon, 26 Jul 1997 05:00:00 GMT',
-                'Last-Modified': (new Date()).toGMTString(),
-                'Cache-Control': 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
-            })
+            .set('Content-Type', 'application/json')
             .send(results);
     } catch (err) {
         next(new AppError('Failed to generate report', 500, err));
