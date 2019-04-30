@@ -13,7 +13,7 @@
 
 		<div class="pa11y-page">
 
-            <div class="report-title-container">
+            <div tabindex="0" class="report-title-container">
 			    <h1>Accessibility report for <a href="<%= data.pageUrl %>" target="_blank"><%= data.documentTitle %></a></h1>
                 <a class="download-report" aria-label="download report" href="data:text/json;charset=utf-8,<%= encodeURIComponent(JSON.stringify(data)) %>" download="report.json">Download</a>
             </div>
@@ -41,15 +41,15 @@
 					});
 
                 if (data.issues.length === 0) { %>
-                     <h1>🎉Hurray! I have found no problems with your website. Now you are ready for a <b>real</b> accessibility test by human beings!</h1>
+                     <h1 tabindex="0">🎉Hurray! I have found no problems with your website. Now you are ready for a <b>real</b> accessibility test by human beings!</h1>
                 <% }
 
 				for (let i = 0; i < issues.length; i++) {
 					let issue = issues[i]; %>
-				<li class="result <%= issue.type %>" data-selector="<%= issue.selector %>">
-					<h2 class="issue-title"><%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
-					<p class="issue-rule"><%= issue.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></p>
-					<pre class="issue-code"><code><%= (issue.context || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') %></code></pre>
+				<li tabindex="0" class="result <%= issue.type %>" data-selector="<%= issue.selector %>">
+					<h2 tabindex="0" class="issue-title"><%= issue.message.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></h2>
+					<p tabindex="0" class="issue-rule"><%= issue.code.replace(/</g, '&lt;').replace(/>/g, '&gt;') %></p>
+					<pre tabindex="0"class="issue-code"><code><%= (issue.context || '').replace(/</g, '&lt;').replace(/>/g, '&gt;') %></code></pre>
 				</li>
 				<% } %>
 			</ul>
