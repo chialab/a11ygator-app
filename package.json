@@ -4,7 +4,11 @@
   "version": "1.0.0",
   "description": "A Web dashboard for accessibility tests.",
   "main": "src/app.js",
+  "homepage": "https://a11ygator.chialab.io/",
   "repository": "github:chialab/a11ygator-app",
+  "bugs": {
+      "url": "https://github.com/chialab/a11ygator-app/issues"
+  },
   "scripts": {
     "start": "node server.js",
     "build": "rollup src/reporter/index.js --name 'Reporter' --file dist/reporter.js --config",

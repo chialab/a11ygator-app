@@ -1,4 +1,5 @@
 const pa11y = require('pa11y');
+const { TimeoutError } = require('p-timeout');
 const { pa11yConfig, MAX_TIMEOUT, MAX_WAIT } = require('./config.js');
 const AppError = require('./appError.js');
 const adapter = require('./screenshots/index.js');
@@ -38,7 +39,7 @@ const buildConfig = (rawConfig) => {
 exports.report = async (req, res, next) => {
     const url = req.query.url;
     if (!url) {
-        next(new AppError('Missing URL', 400));
+        next(new AppError('The URL is not valid', 400));
 
         return;
     }
@@ -51,7 +52,11 @@ exports.report = async (req, res, next) => {
     try {
         results = await pa11y(url, config);
     } catch (err) {
-        next(new AppError('Failed to execute Pa11y', 400, err));
+        if (err instanceof TimeoutError) {
+            next(new AppError('The request timed out', 504, err));
+        } else {
+            next(new AppError('Pa11y failed to execute', 400, err));
+        }
 
         return;
     }
@@ -62,7 +67,7 @@ exports.report = async (req, res, next) => {
         delete results.screenshot;
         results.screenPath = `screenshots/${destFile}`;
     } catch (err) {
-        next(new AppError('Failed to write screenshot', 504, err));
+        next(new AppError('The screenshot could not be saved', 504, err));
 
         return;
     }
@@ -85,7 +90,7 @@ exports.report = async (req, res, next) => {
             .set('Content-Type', 'application/json')
             .send(results);
     } catch (err) {
-        next(new AppError('Failed to generate report', 500, err));
+        next(new AppError('The report could not be generated', 500, err));
 
         return;
     }

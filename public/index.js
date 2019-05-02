@@ -3,16 +3,10 @@ const errorMessage = (error) => `<div class="error">${error || ''}</div>`;
 sendData = async function (ev) {
     ev.preventDefault();
 
-    const elements = document.querySelector("#site-form").elements;
-    const data = {};
-    for (let i = 0; i < elements.length; i++) {
-        const item = elements.item(i);
-        data[item.name] = item.value;
-    }
-
-    const options = data;
-    const url = data.url;
-    delete options.url;
+    const data = new FormData(document.forms['site-form']);
+    const url = data.get('url');
+    data.delete('url');
+    const options = Object.fromEntries(data.entries());
 
     const resultContainer = document.querySelector('.result-container');
 
@@ -35,9 +29,10 @@ sendData = async function (ev) {
                         resultContainer.innerHTML = reportElement.outerHTML;
                     });
             }
-            res.text().then((text) => {
-                resultContainer.innerHTML = errorMessage(text);
-            });
+            return res.text()
+                .then((text) => {
+                    resultContainer.innerHTML = errorMessage(text);
+                });
         })
         .catch((err) => {
             resultContainer.innerHTML = errorMessage(err);

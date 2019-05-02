@@ -23,8 +23,9 @@ exports.app = express()
             res.status(err.status);
         }
 
+        const { bugs } = require('../package.json');
         let errorTemplate = `<div>
-            <h3>Whoops! For some reasons, I can not reach this url... Are you sure it is correct?</h3>
+            <h3>Whoops! ${err.message}. Please check your URL and try again, or <a href="${bugs.url}" target="_blank">open an issue on GitHub</a>!</h3>
         </div>`;
 
         res.send(errorTemplate);
