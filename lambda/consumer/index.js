@@ -21,6 +21,8 @@ const processTweet = async (tweet) => {
   const formattedMessage = formatMessage(results);
   console.log('About to tweet:', formattedMessage);
   const mediaId = await getMediaId(`${A11YGATOR_URL}/${results.screenPath}`);
+  console.log('mediaId:', mediaId)
+
   return T.post('statuses/update', { status: formattedMessage, in_reply_to_status_id: tweet.id_str, auto_populate_reply_metadata: true, media_ids: mediaId })
     .then((res) => {
       console.log('res', res);
@@ -48,9 +50,8 @@ exports.handler = async (event) => {
  * @returns {Object} test results
  */
 const a11ygate = async (url) => {
-  const res = await download(`${A11YGATOR_URL}/report?url=${encodeURIComponent(url)}`);
+  const res = await download(`${A11YGATOR_URL}/report?url=${url}`);
   console.log('A11yJSON', res.toString().slice(0, 100));
-
   return JSON.parse(res.toString());
 };
 
@@ -87,10 +88,11 @@ const getMediaId = async (mediaUrl) => {
   console.log('Got the binary image');
 
   // First we must post the media to Twitter
-  const mediaId = await T.post('media/upload', { media_data: binaryImage })
+  const mediaId = await T.post('media/upload', { media: binaryImage })
     .then((res) => res.media_id_string)
     .catch((err) => console.error('error in media/upload', err));
 
+  console.log('after media/upload', mediaId)
   const altText = 'Screenshot of the requested web page to test.';
   const meta_params = { media_id: mediaId, alt_text: { text: altText } }
 
