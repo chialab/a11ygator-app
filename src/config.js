@@ -1,15 +1,17 @@
 const path = require('path');
 
 const timeoutSec = process.env.FUNCTION_TIMEOUT_SEC ? (parseInt(process.env.FUNCTION_TIMEOUT_SEC, 10) - 1) : 10;
-const timeout = timeoutSec * 1000;
-const wait = Math.round(timeout * .75);
+const maxTimeout = timeoutSec * 1000;
+
+exports.MAX_TIMEOUT = maxTimeout;
+exports.MAX_WAIT = Math.round(maxTimeout * .75);
 
 exports.pa11yConfig = {
     includeNotices: true,
     includeWarnings: true,
     standard: 'WCAG2AAA',
-    wait,
-    timeout,
+    wait: 2000,
+    timeout: maxTimeout,
     chromeLaunchConfig: {
         args: [
             '--no-sandbox',

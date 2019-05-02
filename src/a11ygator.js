@@ -1,8 +1,32 @@
 const pa11y = require('pa11y');
-const { pa11yConfig } = require('./config.js');
+const { pa11yConfig, MAX_TIMEOUT, MAX_WAIT } = require('./config.js');
 const AppError = require('./appError.js');
 const adapter = require('./screenshots/index.js');
 const htmlReporter = require('./../dist/reporter.js');
+
+/**
+ * Do some transformation to raw config.
+ * Take only `wait` and `timeout` from rawConfig.
+ * Take default values if external ones exceed them.
+ *
+ * @param {Object} rawConfig Pa11y configuration as received in request.
+ * @return {Object}
+ */
+const buildConfig = (rawConfig) => {
+    if (!rawConfig) {
+        return pa11yConfig;
+    }
+
+    let { wait, timeout } = pa11yConfig;
+    if (rawConfig.wait) {
+        wait = Math.min(parseInt(rawConfig.wait), MAX_WAIT);
+    }
+    if (rawConfig.timeout) {
+        timeout = Math.min(Math.max(rawConfig.timeout, wait + 3000), MAX_TIMEOUT);
+    }
+
+    return Object.assign({}, pa11yConfig, { timeout, wait });
+};
 
 /**
  * Entry point for a11ygator requests.
@@ -65,25 +89,4 @@ exports.report = async (req, res, next) => {
 
         return;
     }
-};
-
-/**
- * Do some transformation to raw config.
- * Take only `wait` and `timeout` from rawConfig.
- * Take default values if external ones exceed them.
- *
- * @param {Object} rawConfig
- * @return {Object} Refined config object.
- */
-const buildConfig = (rawConfig) => {
-    if (!rawConfig) {
-        return pa11yConfig;
-    }
-
-    let { timeout, wait } = rawConfig;
-
-    timeout = Math.min(parseInt(timeout) || pa11yConfig.timeout, pa11yConfig.timeout);
-    wait = Math.min(parseInt(wait) || pa11yConfig.wait, pa11yConfig.wait);
-
-    return Object.assign({}, pa11yConfig, { timeout, wait });
 };
