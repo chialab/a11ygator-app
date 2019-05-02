@@ -191,3 +191,23 @@
     background-color: #1b7bbc;
 }
 
+.signature {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.signature a {
+    text-decoration: none;
+    color: black;
+    font-size: 0.75em;
+}
+
+.signature span {
+    margin-right: .5em;
+}
+
+.signature svg {
+    height: 1em;
+    width: 1.5em;
+}
+
