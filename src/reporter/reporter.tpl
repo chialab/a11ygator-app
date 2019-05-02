@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8"/>
-	<title>Accessibility report for "<%= data.documentTitle %>"</title>
+    <link rel="icon" type="image/png" href="./favicon.png">
+	<title>A11ygator - Accessibility report for "<%= data.documentTitle %>"</title>
 </head>
 <body>
 
