@@ -182,7 +182,6 @@
     background-color: #42513f;
     border: 0;
     border-radius: 2px;
-    outline: none;
     cursor: pointer;
     transition: all 150ms ease-out;
 }
