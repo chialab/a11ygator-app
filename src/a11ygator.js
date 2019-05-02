@@ -1,8 +1,33 @@
 const pa11y = require('pa11y');
-const { pa11yConfig } = require('./config.js');
+const { TimeoutError } = require('p-timeout');
+const { pa11yConfig, MAX_TIMEOUT, MAX_WAIT } = require('./config.js');
 const AppError = require('./appError.js');
 const adapter = require('./screenshots/index.js');
 const htmlReporter = require('./../dist/reporter.js');
+
+/**
+ * Do some transformation to raw config.
+ * Take only `wait` and `timeout` from rawConfig.
+ * Take default values if external ones exceed them.
+ *
+ * @param {Object} rawConfig Pa11y configuration as received in request.
+ * @return {Object}
+ */
+const buildConfig = (rawConfig) => {
+    if (!rawConfig) {
+        return pa11yConfig;
+    }
+
+    let { wait, timeout } = pa11yConfig;
+    if (rawConfig.wait) {
+        wait = Math.min(parseInt(rawConfig.wait), MAX_WAIT);
+    }
+    if (rawConfig.timeout) {
+        timeout = Math.min(Math.max(rawConfig.timeout, wait + 3000), MAX_TIMEOUT);
+    }
+
+    return Object.assign({}, pa11yConfig, { timeout, wait });
+};
 
 /**
  * Entry point for a11ygator requests.
@@ -14,7 +39,7 @@ const htmlReporter = require('./../dist/reporter.js');
 exports.report = async (req, res, next) => {
     const url = req.query.url;
     if (!url) {
-        next(new AppError('Missing URL', 400));
+        next(new AppError('The URL is not valid', 400));
 
         return;
     }
@@ -27,7 +52,11 @@ exports.report = async (req, res, next) => {
     try {
         results = await pa11y(url, config);
     } catch (err) {
-        next(new AppError('Failed to execute Pa11y', 400, err));
+        if (err instanceof TimeoutError) {
+            next(new AppError('The request timed out', 504, err));
+        } else {
+            next(new AppError('Pa11y failed to execute', 400, err));
+        }
 
         return;
     }
@@ -38,7 +67,7 @@ exports.report = async (req, res, next) => {
         delete results.screenshot;
         results.screenPath = `screenshots/${destFile}`;
     } catch (err) {
-        next(new AppError('Failed to write screenshot', 504, err));
+        next(new AppError('The screenshot could not be saved', 504, err));
 
         return;
     }
@@ -61,29 +90,8 @@ exports.report = async (req, res, next) => {
             .set('Content-Type', 'application/json')
             .send(results);
     } catch (err) {
-        next(new AppError('Failed to generate report', 500, err));
+        next(new AppError('The report could not be generated', 500, err));
 
         return;
     }
-};
-
-/**
- * Do some transformation to raw config.
- * Take only `wait` and `timeout` from rawConfig.
- * Take default values if external ones exceed them.
- *
- * @param {Object} rawConfig
- * @return {Object} Refined config object.
- */
-const buildConfig = (rawConfig) => {
-    if (!rawConfig) {
-        return pa11yConfig;
-    }
-
-    let { timeout, wait } = rawConfig;
-
-    timeout = Math.min(parseInt(timeout) || pa11yConfig.timeout, pa11yConfig.timeout);
-    wait = Math.min(parseInt(wait) || pa11yConfig.wait, pa11yConfig.wait);
-
-    return Object.assign({}, pa11yConfig, { timeout, wait });
 };
