@@ -14,7 +14,7 @@ const PA11Y_CONFIG = {
   includeWarnings: true,
   standard: 'WCAG2AA',
   wait: 2000,
-  timeout: 3000,
+  timeout: 10000,
   log: {
     debug: console.log.bind(console, '[Pa11y | Debug]'),
     error: console.error.bind(console, '[Pa11y | Error]'),
@@ -45,7 +45,6 @@ const newReport = async ({ url, config = {} }) => {
   // Generate report and take screenshot afterwards.
   try {
     config = Object.assign({}, PA11Y_CONFIG, config, { browser, page });
-    config.timeout = config.wait + 1000;
     console.log(`Generating new report for ${url} (wait ${config.wait}ms)...`);
 
     console.time('Report');
