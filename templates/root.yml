@@ -242,8 +242,8 @@ Resources:
       Handler: 'index.handler'
       Role: !GetAtt 'ReportRole.Arn'
       Runtime: 'nodejs8.10'
-      MemorySize: 2048
-      Timeout: 300
+      MemorySize: 1024
+      Timeout: 15
   ReportFunctionEventSourceMapping:
     Type: 'AWS::Lambda::EventSourceMapping'
     Properties:
@@ -463,7 +463,7 @@ Resources:
       Handler: 'index.handler'
       Role: !GetAtt 'TweetRole.Arn'
       Runtime: 'nodejs10.x'
-      MemorySize: 512
+      MemorySize: 320
       Timeout: 10
   TweetFunctionPermission:
     Type: 'AWS::Lambda::Permission'
