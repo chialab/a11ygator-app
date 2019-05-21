@@ -4,6 +4,12 @@ Transform: 'AWS::Serverless-2016-10-31'
 Description: 'Deploy A11ygator Bot application.'
 
 Parameters:
+  Hostname:
+    Type: 'String'
+    Description: 'Hostname where application will be available.'
+  AcmCertificate:
+    Type: 'String'
+    Description: 'ACM certificate valid for the given hostname.'
   ConsumerKey:
     Type: 'String'
     Description: 'Consumer key of Twitter application.'
@@ -30,11 +36,310 @@ Parameters:
 Outputs:
   TwitterWebhookUrl:
     Description: 'URL of Twitter Webhook.'
-    Value: !Sub 'https://${Api}.execute-api.${AWS::Region}.amazonaws.com/prod/webhook/twitter'
+    Value: !Sub 'https://${Hostname}/api/webhook/twitter'
+  AppBucketName:
+    Description: 'Name of bucket where HTML+JS file are stored.'
+    Value: !Ref 'AppBucket'
+  DistributionId:
+    Description: 'ID of CloudFront distribution.'
+    Value: !Ref 'Distribution'
 
 Resources:
-  TweetsQueue:
+  ############################
+  ### Bucket for app files ###
+  ############################
+  AppBucket:
+    Type: 'AWS::S3::Bucket'
+  AppBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref 'AppBucket'
+      PolicyDocument:
+        Statement:
+          - Principal:
+              CanonicalUser: !GetAtt 'OriginAccessIdentity.S3CanonicalUserId'
+            Action: 's3:ListBucket'
+            Effect: 'Allow'
+            Resource: !GetAtt 'AppBucket.Arn'
+          - Principal:
+              CanonicalUser: !GetAtt 'OriginAccessIdentity.S3CanonicalUserId'
+            Action: 's3:GetObject'
+            Effect: 'Allow'
+            Resource: !Sub '${AppBucket.Arn}/*'
+
+  ###############################
+  ### CloudFront distribution ###
+  ###############################
+  OriginAccessIdentity:
+    Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: !Sub 'Origin Access Identity for ${AWS::StackName}'
+  Distribution:
+    Type: 'AWS::CloudFront::Distribution'
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Ref 'Hostname'
+        Comment: !Sub 'Distribution for ${Hostname} created for ${AWS::StackName}.'
+        DefaultCacheBehavior:
+          Compress: yes
+          ForwardedValues:
+            QueryString: no
+          TargetOriginId: 'app'
+          ViewerProtocolPolicy: 'redirect-to-https'
+        CacheBehaviors:
+          - PathPattern: 'screenshots/*'
+            Compress: yes
+            ForwardedValues:
+              QueryString: no
+            TargetOriginId: 'screenshots'
+            ViewerProtocolPolicy: 'redirect-to-https'
+          - PathPattern: 'api/*'
+            AllowedMethods: ['GET', 'HEAD', 'OPTIONS', 'PUT', 'PATCH', 'POST', 'DELETE']
+            Compress: yes
+            ForwardedValues:
+              QueryString: yes
+              Headers: ['Content-Type', 'X-Twitter-Webhooks-Signature']
+            TargetOriginId: 'api'
+            ViewerProtocolPolicy: 'redirect-to-https'
+        DefaultRootObject: 'index.html'
+        Enabled: yes
+        HttpVersion: 'http2'
+        IPV6Enabled: yes
+        Origins:
+          - Id: 'app'
+            DomainName: !Sub '${AppBucket}.s3-${AWS::Region}.amazonaws.com'
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${OriginAccessIdentity}'
+          - Id: 'screenshots'
+            DomainName: !Sub '${ReportsBucket}.s3-${AWS::Region}.amazonaws.com'
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${OriginAccessIdentity}'
+          - Id: 'api'
+            DomainName: !Sub '${Api}.execute-api.${AWS::Region}.amazonaws.com'
+            CustomOriginConfig:
+              OriginProtocolPolicy: 'https-only'
+        PriceClass: 'PriceClass_100'
+        ViewerCertificate:
+          AcmCertificateArn: !Ref 'AcmCertificate'
+          MinimumProtocolVersion: 'TLSv1.1_2016'
+          SslSupportMethod: 'sni-only'
+
+  ##########################################
+  ### Bucket where to store reports data ###
+  ##########################################
+  ReportsBucket:
+    Type: 'AWS::S3::Bucket'
+  ReportsBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      Bucket: !Ref 'ReportsBucket'
+      PolicyDocument:
+        Statement:
+          - Principal:
+              CanonicalUser: !GetAtt 'OriginAccessIdentity.S3CanonicalUserId'
+            Action: 's3:ListBucket'
+            Effect: 'Allow'
+            Resource: !GetAtt 'ReportsBucket.Arn'
+          - Principal:
+              CanonicalUser: !GetAtt 'OriginAccessIdentity.S3CanonicalUserId'
+            Action: 's3:GetObject'
+            Effect: 'Allow'
+            Resource: !Sub '${ReportsBucket.Arn}/screenshots/*'
+
+  #####################################
+  ### Queue for reports to generate ###
+  #####################################
+  ReportsQueue:
     Type: 'AWS::SQS::Queue'
+
+  ###################################
+  ### Topic for generated reports ###
+  ###################################
+  ReportsReadyTopic:
+    Type: 'AWS::SNS::Topic'
+
+  #####################
+  ### Lambda layers ###
+  #####################
+  Pa11yLayer:
+    Type: 'AWS::Lambda::LayerVersion'
+    Properties:
+      CompatibleRuntimes:
+        - 'nodejs8.10'
+      Content: '../layers/pa11y'
+      Description: !Sub 'Layer with Pa11y and Puppeteer for ${AWS::StackName}.'
+  TwitLayer:
+    Type: 'AWS::Lambda::LayerVersion'
+    Properties:
+      CompatibleRuntimes:
+        - 'nodejs8.10'
+        - 'nodejs10.x'
+      Content: '../layers/twit'
+      Description: !Sub 'Layer with Twit for ${AWS::StackName}.'
+  UuidLayer:
+    Type: 'AWS::Lambda::LayerVersion'
+    Properties:
+      CompatibleRuntimes:
+        - 'nodejs8.10'
+        - 'nodejs10.x'
+      Content: '../layers/uuid'
+      Description: !Sub 'Layer with UUID for ${AWS::StackName}.'
+
+  ###########################################################
+  ### Function to generate reports from enqueued messages ###
+  ###########################################################
+  ReportRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: 'Consumer'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: 'ConsumeMessages'
+                Effect: 'Allow'
+                Action:
+                  - 'sqs:ReceiveMessage'
+                  - 'sqs:DeleteMessage'
+                  - 'sqs:GetQueueAttributes'
+                Resource: !GetAtt 'ReportsQueue.Arn'
+        - PolicyName: 'Reports'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: 'WriteReports'
+                Effect: 'Allow'
+                Action: 's3:PutObject'
+                Resource:
+                  - !Sub '${ReportsBucket.Arn}/reports/*'
+                  - !Sub '${ReportsBucket.Arn}/screenshots/*'
+              - Sid: 'PublishNotification'
+                Effect: 'Allow'
+                Action: 'sns:Publish'
+                Resource: !Ref 'ReportsReadyTopic'
+  ReportFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Layers:
+        - !Ref 'Pa11yLayer'
+      Code: '../lambda/report'
+      Description: !Sub 'Consume tweet queue messages for ${AWS::StackName}.'
+      Environment:
+        Variables:
+          S3_BUCKET: !Ref 'ReportsBucket'
+          SNS_TOPIC: !Ref 'ReportsReadyTopic'
+      Handler: 'index.handler'
+      Role: !GetAtt 'ReportRole.Arn'
+      Runtime: 'nodejs8.10'
+      MemorySize: 2048
+      Timeout: 300
+  ReportFunctionEventSourceMapping:
+    Type: 'AWS::Lambda::EventSourceMapping'
+    Properties:
+      BatchSize: 1
+      Enabled: yes
+      EventSourceArn: !GetAtt 'ReportsQueue.Arn'
+      FunctionName: !GetAtt 'ReportFunction.Arn'
+
+  #####################################################
+  ### Function to handle report generation requests ###
+  #####################################################
+  ReportEnqueueRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: 'SQS'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: 'EnqueueReports'
+                Effect: 'Allow'
+                Action: 'sqs:SendMessage'
+                Resource: !GetAtt 'ReportsQueue.Arn'
+  ReportEnqueueFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Layers:
+        - !Ref 'UuidLayer'
+      Code: '../lambda/report-enqueue'
+      Description: !Sub 'Handle report generation requests for ${AWS::StackName}.'
+      Environment:
+        Variables:
+          REPORTS_QUEUE: !Ref 'ReportsQueue'
+      Handler: 'index.handler'
+      Role: !GetAtt 'ReportEnqueueRole.Arn'
+      Runtime: 'nodejs10.x'
+  ReportEnqueueFunctionPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !GetAtt 'ReportEnqueueFunction.Arn'
+      Action: 'lambda:InvokeFunction'
+      Principal: 'apigateway.amazonaws.com'
+      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/*/POST/reports'
+
+  ##########################################
+  ### Function to view generated reports ###
+  ##########################################
+  ReportViewRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: 'Reports'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: 'DownloadReportData'
+                Effect: 'Allow'
+                Action: 's3:GetObject'
+                Resource: !Sub '${ReportsBucket.Arn}/reports/*'
+  ReportViewFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Code: '../lambda/report-view'
+      Description: !Sub 'Handle report view requests for ${AWS::StackName}.'
+      Environment:
+        Variables:
+          S3_BUCKET: !Ref 'ReportsBucket'
+          HOSTNAME: !Ref 'Hostname'
+      Handler: 'index.handler'
+      Role: !GetAtt 'ReportViewRole.Arn'
+      Runtime: 'nodejs10.x'
+  ReportViewFunctionPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !GetAtt 'ReportViewFunction.Arn'
+      Action: 'lambda:InvokeFunction'
+      Principal: 'apigateway.amazonaws.com'
+      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/*/GET/reports/*'
 
   ###########################################################
   ### Function to handle Twitter Challenge Response Check ###
@@ -54,14 +359,14 @@ Resources:
   TwitterCrcFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
-      Code: '../lambda/crc'
+      Code: '../lambda/twitter-crc'
       Description: !Sub 'Handle Twitter Challenge Response Check for ${AWS::StackName}.'
       Environment:
         Variables:
           CONSUMER_SECRET: !Ref 'ConsumerSecret'
       Handler: 'index.handler'
       Role: !GetAtt 'TwitterCrcRole.Arn'
-      Runtime: 'nodejs8.10'
+      Runtime: 'nodejs10.x'
   TwitterCrcFunctionPermission:
     Type: 'AWS::Lambda::Permission'
     Properties:
@@ -90,22 +395,24 @@ Resources:
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
-              - Sid: 'EnqueueTweets'
+              - Sid: 'EnqueueReports'
                 Effect: 'Allow'
                 Action: 'sqs:SendMessage'
-                Resource: !GetAtt 'TweetsQueue.Arn'
+                Resource: !GetAtt 'ReportsQueue.Arn'
   TwitterWebhookFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
-      Code: '../lambda/webhook'
+      Layers:
+        - !Ref 'UuidLayer'
+      Code: '../lambda/twitter-webhook'
       Description: !Sub 'Handle Twitter webhook events for ${AWS::StackName}.'
       Environment:
         Variables:
-          SQS_QUEUE: !Ref 'TweetsQueue'
+          REPORTS_QUEUE: !Ref 'ReportsQueue'
           CONSUMER_SECRET: !Ref 'ConsumerSecret'
       Handler: 'index.handler'
       Role: !GetAtt 'TwitterWebhookRole.Arn'
-      Runtime: 'nodejs8.10'
+      Runtime: 'nodejs10.x'
   TwitterWebhookFunctionPermission:
     Type: 'AWS::Lambda::Permission'
     Properties:
@@ -114,10 +421,10 @@ Resources:
       Principal: 'apigateway.amazonaws.com'
       SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/*/POST/webhook/twitter'
 
-  ##########################################
-  ### Function to process queue messages ###
-  ##########################################
-  QueueTriggerRole:
+  ###########################################################
+  ### Function to reply to tweets when report is complete ###
+  ###########################################################
+  TweetRole:
     Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
@@ -130,39 +437,49 @@ Resources:
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
       Policies:
-        - PolicyName: 'SQS'
+        - PolicyName: 'Screenshots'
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
-              - Sid: 'ConsumeTweets'
+              - Sid: 'DownloadScreenshots'
                 Effect: 'Allow'
-                Action:
-                  - 'sqs:ReceiveMessage'
-                  - 'sqs:DeleteMessage'
-                  - 'sqs:GetQueueAttributes'
-                Resource: !GetAtt 'TweetsQueue.Arn'
-  QueueTriggerFunction:
+                Action: 's3:GetObject'
+                Resource: !Sub '${ReportsBucket.Arn}/screenshots/*'
+  TweetFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
-      Code: '../lambda/consumer'
-      Description: !Sub 'Consume tweet queue messages for ${AWS::StackName}.'
+      Layers:
+        - !Ref 'TwitLayer'
+      Code: '../lambda/tweet'
+      Description: !Sub 'Reply to tweets for ${AWS::StackName}.'
       Environment:
         Variables:
           CONSUMER_KEY: !Ref 'ConsumerKey'
           CONSUMER_SECRET: !Ref 'ConsumerSecret'
           OAUTH_TOKEN: !Ref 'OAuthToken'
           OAUTH_TOKEN_SECRET: !Ref 'OAuthTokenSecret'
+          S3_BUCKET: !Ref 'ReportsBucket'
+          HOSTNAME: !Ref 'Hostname'
       Handler: 'index.handler'
-      Role: !GetAtt 'QueueTriggerRole.Arn'
-      Runtime: 'nodejs8.10'
-      Timeout: 30
-  QueueTriggerFunctionEventSourceMapping:
-    Type: 'AWS::Lambda::EventSourceMapping'
+      Role: !GetAtt 'TweetRole.Arn'
+      Runtime: 'nodejs10.x'
+      MemorySize: 512
+      Timeout: 10
+  TweetFunctionPermission:
+    Type: 'AWS::Lambda::Permission'
     Properties:
-      BatchSize: 1
-      Enabled: yes
-      EventSourceArn: !GetAtt 'TweetsQueue.Arn'
-      FunctionName: !GetAtt 'QueueTriggerFunction.Arn'
+      FunctionName: !GetAtt 'TweetFunction.Arn'
+      Action: 'lambda:InvokeFunction'
+      Principal: 'sns.amazonaws.com'
+      SourceArn: !Ref 'ReportsReadyTopic'
+  TweetFunctionSubscription:
+    Type: 'AWS::SNS::Subscription'
+    Properties:
+      TopicArn: !Ref 'ReportsReadyTopic'
+      Protocol: 'lambda'
+      Endpoint: !GetAtt 'TweetFunction.Arn'
+      FilterPolicy:
+        source: [ 'twitter' ]
 
   ###################
   ### API Gateway ###
@@ -171,7 +488,7 @@ Resources:
     Type: 'AWS::Serverless::Api'
     Properties:
       Name: !Ref 'AWS::StackName'
-      StageName: 'prod'
+      StageName: 'api'
       EndpointConfiguration: 'REGIONAL'
       MethodSettings:
         - HttpMethod: '*'
@@ -179,16 +496,73 @@ Resources:
           LoggingLevel: !Ref 'ApiLoggingLevel'
       DefinitionBody:
         openapi: '3.0.0'
-        schemes:
-          - 'https'
+        info:
+          title: !Ref 'AWS::StackName'
+          description: !Sub 'REST API for ${AWS::StackName}.'
+          version: '2019-05-19'
         x-amazon-apigateway-request-validators:
           all:
             validateRequestBody: yes
             validateRequestParameters: yes
         paths:
+          /reports:
+            post:
+              description: 'Request report generation.'
+              x-amazon-apigateway-request-validator: 'all'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/ReportGenerationRequest'
+              responses:
+                '201':
+                  description: 'Report enqueued.'
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/ReportGenerationResponse'
+              x-amazon-apigateway-integration:
+                type: 'aws'
+                httpMethod: 'POST'
+                uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ReportEnqueueFunction.Arn}/invocations'
+                requestTemplates:
+                  application/json: '$input.json("$")'
+                responses:
+                  default:
+                    statusCode: 201
+                    responseTemplates:
+                      application/json: '$input.json("$")'
+          /reports/{id}:
+            get:
+              description: 'View report.'
+              x-amazon-apigateway-request-validator: 'all'
+              parameters:
+                - in: 'path'
+                  name: 'id'
+                  schema:
+                    type: 'string'
+                  description: 'Report ID.'
+                  required: true
+                - in: 'query'
+                  name: 'format'
+                  schema:
+                    type: 'string'
+                    enum:
+                      - 'json'
+                      - 'html'
+                  description: 'Report format.'
+              responses:
+                '200':
+                  description: 'Report.'
+                '404':
+                  description: 'Report not found.'
+              x-amazon-apigateway-integration:
+                type: 'aws_proxy'
+                httpMethod: 'POST'
+                uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ReportViewFunction.Arn}/invocations'
           /webhook/twitter:
             get:
-              description: !Sub 'Twitter Challenge Response Check endpoint for ${AWS::StackName}.'
+              description: 'Pass Twitter Challenge Response Check (CRC).'
               x-amazon-apigateway-request-validator: 'all'
               parameters:
                 - in: 'query'
@@ -204,14 +578,19 @@ Resources:
                     application/json:
                       schema:
                         $ref: '#/components/schemas/TwitterCrcResponse'
-              security:
-                - api_key: []
               x-amazon-apigateway-integration:
-                type: 'aws_proxy'
+                type: 'aws'
                 httpMethod: 'POST'
                 uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TwitterCrcFunction.Arn}/invocations'
+                requestTemplates:
+                  application/json: '{ "crcToken": "$input.params("crc_token")" }'
+                responses:
+                  default:
+                    statusCode: 200
+                    responseTemplates:
+                      application/json: '{ "response_token": $input.json("$.responseToken") }'
             post:
-              description: !Sub 'Webhook endpoint for ${AWS::StackName}.'
+              description: 'Receive notifications for content updates from Twitter.'
               x-amazon-apigateway-request-validator: 'all'
               parameters:
                 - in: 'header'
@@ -228,21 +607,72 @@ Resources:
               responses:
                 '204':
                   description: 'Acknowledged.'
-              security:
-                - api_key: []
+                '401':
+                  description: 'Bad X-Twitter-Webhook-Signature.'
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/ErrorResponse'
               x-amazon-apigateway-integration:
-                type: 'aws_proxy'
+                type: 'aws'
                 httpMethod: 'POST'
                 uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${TwitterWebhookFunction.Arn}/invocations'
+                requestTemplates:
+                  application/json: '{ "signature": "$input.params("X-Twitter-Webhooks-Signature")", "body": "$util.escapeJavaScript($input.body).replaceAll("\\''","''")" }'
+                responses:
+                  default:
+                    statusCode: 204
+                  'Bad X-Twitter-Webhooks-Signature':
+                    statusCode: 401
+                    responseTemplates:
+                      application/json: '{ "message": $input.json("errorMessage") }'
         components:
           schemas:
+            ErrorResponse:
+              type: 'object'
+              properties:
+                message:
+                  type: 'string'
+              required: [ 'message' ]
+            ReportGenerationRequest:
+              type: 'object'
+              properties:
+                url:
+                  type: 'string'
+                  format: 'url'
+                config:
+                  type: 'object'
+                  properties:
+                    wait:
+                      type: 'integer'
+                      minimum: 0
+                      maximum: 8000
+                    standard:
+                      type: 'string'
+                      enum:
+                        - 'Section508'
+                        - 'WCAG2A'
+                        - 'WCAG2AA'
+                        - 'WCAG2AAA'
+                  additionalProperties: no
+              required: [ 'url' ]
+              additionalProperties: no
+            ReportGenerationResponse:
+              type: 'object'
+              properties:
+                id:
+                  type: 'string'
+                url:
+                  type: 'string'
+                  format: 'url'
+              required: [ 'id', 'url' ]
+              additionalProperties: no
             TwitterCrcResponse:
               type: 'object'
               properties:
                 response_token:
                   type: 'string'
-              required:
-                - 'response_token'
+              required: [ 'response_token' ]
               additionalProperties: no
             TwitterWebhookRequest:
               type: 'object'

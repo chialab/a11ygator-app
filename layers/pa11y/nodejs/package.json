@@ -1,10 +1,7 @@
 {
   "dependencies": {
-    "aws-sdk": "^2.441.0",
     "chrome-aws-lambda": "^1.14.0",
     "pa11y": "github:edoardocavazza/pa11y",
-    "puppeteer": "^1.14.0",
-    "twit": "^2.2.11",
-    "uuid": "^3.3.2"
+    "puppeteer": "^1.14.0"
   }
 }

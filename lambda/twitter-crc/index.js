@@ -13,12 +13,14 @@ const getChallengeResponse = (crcToken, consumerSecret) => crypto.createHmac('sh
   .update(crcToken)
   .digest('base64');
 
-exports.handler = async (event) => {
-  const crcToken = event.queryStringParameters.crc_token;
+/**
+ * Respond to Twitter CRC challenges.
+ *
+ * @param {{ crcToken: string }} event CRC token.
+ * @returns {Promise<{ responseToken: string }>}
+ */
+exports.handler = async ({ crcToken }) => {
   const responseToken = `sha256=${getChallengeResponse(crcToken, CONSUMER_SECRET)}`;
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ response_token: responseToken }),
-  };
+  return { responseToken };
 };
