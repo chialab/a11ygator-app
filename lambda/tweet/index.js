@@ -88,7 +88,7 @@ const uploadMedia = async (url, key) => {
 /**
  * Tweet answer to a tweet for which report was successfully generated.
  *
- * @param {{ id: string, url: string, report: Report, tweet: {}, files: { report: string, screenshot: string } }} data Data.
+ * @param {{ id: string, url: string, report: Report, tweet: { id_str: string }, files: { report: string, screenshot: string } }} data Data.
  * @return {Promise<void>}
  */
 const tweetReport = async ({ id, url, report, tweet, files }) => {
@@ -97,6 +97,20 @@ const tweetReport = async ({ id, url, report, tweet, files }) => {
 
   console.time('Tweeting');
   await T.post('statuses/update', { status: formattedMessage, in_reply_to_status_id: tweet.id_str, auto_populate_reply_metadata: true, media_ids: mediaId });
+  console.timeEnd('Tweeting');
+};
+
+/**
+ * Tweet reply to a tweet for which report could not be generated because some error occurred.
+ *
+ * @param {{ url: string, tweet: { id_str: string } }} data Data.
+ * @returns {Promise<void>}
+ */
+const tweetError = async ({ url, tweet }) => {
+  const message = `I couldn't generate a report for ${url}\nAre you sure you typed it correctly?`;
+
+  console.time('Tweeting');
+  await T.post('statuses/update', { status: message, in_reply_to_status_id: tweet.id_str, auto_populate_reply_metadata: true });
   console.timeEnd('Tweeting');
 };
 
@@ -115,7 +129,7 @@ exports.handler = async (event) => Promise.all(
         await tweetReport(data);
       } else {
         console.log(`Report ${data.id} resulted in an error`, data.error);
-        // TODO;
+        await tweetError(data);
       }
     } catch (err) {
       console.error(`Unable to generate report for request ${data.id}!`, JSON.stringify(data));
