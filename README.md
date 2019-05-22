@@ -1,28 +1,82 @@
-<center>
-<h1>A11ygator</h1>
-<img src="docs/logo.png" />
-</center>
+<p align="center">
+    <img src="./docs/logo.png" width="100">
+</p>
+<h1 align="center">A11ygator</h1>
+<p align="center">
+    <a href="https://chrome.google.com/webstore/detail/a11ygator/imfmlpemomjmfncnmkjdeeinbkichaio">Chrome extension</a> |
+    <a href="https://addons.mozilla.org/it/firefox/addon/a11ygator">Firefox extension</a> |
+    <a href="https://a11ygator.chialab.io/">WebApp</a> |
+    <a href="https://www.w3.org/WAI/standards-guidelines/wcag/">WCAG</a> |
+    <a href="https://github.com/chialab/a11ygator-extension">Source</a> |
+    <a href="https://www.chialab.io">Authors</a>
+</p>
 
-An application and Twitter bot that bites websites to taste their accessibility.
+Validate the accessibility of your website against W3C's Web Content Accessibility Guidelines.
 
-Infrastructure
---------------
+A11ygator is a free tool for web developers to check compliance with the WCAG rules.
 
-![Infrastructure overview](docs/infrastructure.png)
+Simply type an URL and choose the WCAG standard.
 
-* The app (static HTML+JS+CSS files) is stored on a bucket and is served via CloudFront.
-* The screenshots are stored on another bucket, along with JSON reports, and are served via CloudFront (`/screenshots/*` path pattern)
-* The API is configured via API Gateway, and proxied via CloudFront (`/api/*` path pattern)
+![homepage screenshot](./docs/a11ygator.png?raw=true "homepage screenshot")
 
-### API Endpoints
 
-- `GET /webhooks/twitter`: endpoint required by Twitter for webhooks, to pass Challenge Response Check (CRC).
-- `POST /webhooks/twitter`: Twitter webhook that will receive payloads and selectively enqueue messages into the SQS Queue for reports to be generated.
-- `POST /reports`: endpoint to manually enqueue a report generation.
-- `GET /reports/{id}`: endpoint to obtain a generated report in either JSON or HTML format — it will return 404 until the report is ready.
+🚀Now also available as Browser Extension! Check out <a href="https://chrome.google.com/webstore/detail/a11ygator/imfmlpemomjmfncnmkjdeeinbkichaio">A11ygator for Chrome</a> and <a href="https://addons.mozilla.org/it/firefox/addon/a11ygator">A11ygator for Firefox</a>.
 
-### Background processing
 
-* Report generation requests are sent to a SNS Queue.
-* Enqueued messages are consumed by a Lambda function that loads the URL, waits for the configured amount of time, and runs Pa11y with the configured standard, then takes two screenshots (viewport and full-page), uploads the screenshots and the report JSON to an S3 bucket, and sends a notification to a SNS Topic.
-* A Lambda function is listening for notifications of generated reports that were requested via Twitter, and tweets a reply by uploading the viewport screenshot to Twitter and attaching it to a Tweet that contains aggregate data and a link to the HTML report.
+## Awake the A11ygator
+
+Requirements
+
+* [Node JS](https://nodejs.org/) (>= 8.0.0)
+* [Yarn](https://yarnpkg.com/)
+
+Run the server
+
+```.sh
+yarn install
+yarn build
+yarn start
+```
+
+In local environment, navigate with the browser to **`https://localhost:3000/`** to visualize the app.
+
+## API Usage
+
+It is also possible to directly use `A11ygator` without filling the form.
+
+To get a raw JSON report with default options, make a GET call to
+
+```http
+GET /report?url=<site-to-test> HTTP/1.1
+```
+
+To get an HTML report just add query param 'format'
+
+```http
+GET /report?url=<site-to-test&format=html> HTTP/1.1
+```
+
+To pass options, make a POST call embedding them on the request's body.
+
+Example:
+
+```http
+POST /report?url=<site-to-test> HTTP/1.1
+Content-Type: application/json
+{
+    "wait": 5000,
+    "timeout": 8000
+}
+```
+
+## More
+
+Also check out [A11ygator Extension repository](https://github.com/chialab/a11ygator-extension).
+
+## Credits
+
+A11ygator uses [Pa11y](https://github.com/pa11y/pa11y) under the hood.
+
+## License
+
+A11ygator is released under the [MIT](./LICENSE) license.

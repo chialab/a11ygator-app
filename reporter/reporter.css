@@ -1,0 +1,212 @@
+.pa11y-report {
+    font-family: -apple-system, BlinkMacSystemFont, "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 22px;
+    color: #333;
+}
+
+.pa11y-report h1,
+.pa11y-report h2,
+.pa11y-report p,
+.pa11y-report pre,
+.pa11y-report ul {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.pa11y-report h1 {
+    margin-bottom: 1rem;
+    font-size: 1.6rem;
+    line-height: 1.2em;
+    font-weight: normal;
+}
+
+.pa11y-report h1 a {
+    color: #008cff;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.pa11y-report h2 {
+    font-size: 1rem;
+    line-height: 1.4em;
+}
+
+.pa11y-report pre {
+    margin: 0;
+    padding: 0 1rem 1rem 1rem;
+    margin-top: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+
+.pa11y-report code {
+    display: block;
+    width: 100%;
+    padding: 1rem 0;
+    white-space: nowrap;
+    overflow: auto;
+}
+
+.pa11y-report code::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.pa11y-report code::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 6px;
+}
+
+.pa11y-report code::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pa11y-report hr {
+    border: solid 2px #e5e5e5;
+    border-width: 2px 0 0 0;
+}
+
+.pa11y-report footer {
+    display: flex;
+    flex-direction: row;
+    color: #999;
+}
+
+.pa11y-report footer > *:first-child {
+    flex: 1 auto;
+}
+
+.pa11y-report footer a {
+    color: #000;
+    text-decoration: none;
+}
+
+.pa11y-report footer a img {
+    height: 2em;
+    margin: 0 0.5em 0 0.75em;
+    vertical-align: middle;
+}
+
+.pa11y-report .pa11y-page {
+    max-width: 800px;
+    padding: 2rem 1rem;
+}
+
+.pa11y-report .issue-rule {
+    word-break: break-all;
+}
+
+.pa11y-report .results-list {
+    margin-left: 0;
+    padding-left: 0;
+    list-style: none;
+    margin-top: 1rem;
+}
+
+.pa11y-report .result {
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.pa11y-report .error {
+    background-color: rgba(231, 76, 60, 0.5);
+}
+
+.pa11y-report .warning {
+    background-color: rgba(243, 156, 18, 0.5);
+}
+
+.pa11y-report .notice {
+    background-color: rgba(52, 152, 219, 0.5);
+}
+
+.pa11y-report .screenshot {
+    max-width: 100%;
+    display: block;
+}
+
+.pa11y-report .screenshot-container {
+    border: solid #d5d5d5;
+    border-width: 30px 4px 4px;
+    border-radius: 4px;
+    overflow: scroll;
+    max-height: 500px;
+    margin: 2em auto;
+    display: block;
+}
+
+.pa11y-report .buttons-container {
+    position: absolute;
+    margin-top: -24px;
+    margin-left: 5px;
+}
+
+.pa11y-report .button-osx {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    border-radius: 10px;
+}
+
+.pa11y-report .close {
+    background: #ff5c5c;
+    border: 1px solid #e33e41;
+}
+
+.pa11y-report .minimize {
+    background: #ffbd4c;
+    border: 1px solid #e09e3e;
+}
+
+.pa11y-report .zoom {
+    background: #00ca56;
+    border: 1px solid #14ae46;
+}
+
+.report-title-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.report-title-container h1 {
+    margin: 0;
+}
+
+.download-report {
+    margin-left: 1em;
+    color: #fff;
+    padding: 0.75em 1em;
+    text-decoration: none;
+    background-color: #42513f;
+    border: 0;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 150ms ease-out;
+}
+
+.download-report:hover {
+    background-color: #1b7bbc;
+}
+
+.signature {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.signature a {
+    text-decoration: none;
+    color: black;
+    font-size: 0.75em;
+}
+
+.signature span {
+    margin-right: .5em;
+}
+
+.signature svg {
+    height: 1em;
+    width: 1.5em;
+}
+
