@@ -5,18 +5,19 @@ const errorMessage = (error) => `<div class="error">${error || ''}</div>`;
  *
  * @param {string} id Report ID.
  * @param {'html' | 'json'} format Report format.
- * @returns {Promise<string>}
+ * @returns {Promise<{ statusCode: number, body: string }>}
  */
-self.fetchReport = async (id, format) => fetch(`api/reports/${id}?format=${format || 'html'}&ts=${Date.now()}`)
+self.fetchReport = (id, format) => fetch(`api/reports/${id}?format=${format || 'html'}&ts=${Date.now()}`)
   .then((res) => {
-    if (!res.ok) {
-      throw new Error(`${res.status} ${res.statusText}`);
+    if (res.status === 204) {
+      return Promise.reject();
     }
 
-    return res.text();
+    return res.text()
+      .then((body) => ({ statusCode: res.status, body }));
   });
 
-self.sendData = async function (ev) {
+self.sendData = function (ev) {
     ev.preventDefault();
 
     const resultContainer = document.querySelector('.result-container');
@@ -45,16 +46,28 @@ self.sendData = async function (ev) {
         const interval = setInterval(
           () => {
             fetchReport(res.id, 'html')
-              .then((html) => {
+              .then(({ statusCode, body }) => {
                 clearInterval(interval);
-                const parser = new DOMParser();
-                const htmlDocument = parser.parseFromString(html, 'text/html');
-                const reportElement = htmlDocument.querySelector('.pa11y-report');
-                resultContainer.innerHTML = reportElement.outerHTML;
+
+                switch (statusCode) {
+                  case 200:
+                    const parser = new DOMParser();
+                    const htmlDocument = parser.parseFromString(body, 'text/html');
+                    const reportElement = htmlDocument.querySelector('.pa11y-report');
+                    resultContainer.innerHTML = reportElement.outerHTML;
+                    break;
+
+                  case 422:
+                    resultContainer.innerHTML = errorMessage('The URL you provided could not be reached. Are you sure it is correct?');
+                    break;
+
+                  default:
+                    resultContainer.innerHTML = errorMessage('An unknown error occurred. Please try again!');
+                }
               })
-              .catch(console.error.bind(console, 'Report not yet ready'));
+              .catch(() => console.error('Report not yet ready'));
           },
-          2000
+          data.config.wait
         );
       })
       .catch((err) => {

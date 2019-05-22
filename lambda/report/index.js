@@ -3,11 +3,17 @@ const chromium = require('chrome-aws-lambda');
 const pa11y = require('pa11y');
 const puppeteer = require('puppeteer');
 
+const REPORTS_TABLE = process.env.REPORTS_TABLE;
 const S3_BUCKET = process.env.S3_BUCKET;
 const SNS_TOPIC = process.env.SNS_TOPIC;
 
+const DDB = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
 const S3 = new AWS.S3({ apiVersion: '2006-03-01' });
 const SNS = new AWS.SNS({ apiVersion: '2010-03-31' });
+
+/** @typedef {'Section508' | 'WCAG2A' | 'WCAG2AA' | 'WCAG2AAA'} Standard */
+/** @typedef {'notice' | 'warning' | 'error'} IssueType */
+/** @typedef {{ issues: { type: IssueType }[], counts: { [x in IssueType]: number }, timestamp: number, standard: Standard }} Report */
 
 const PA11Y_CONFIG = {
   includeNotices: true,
@@ -29,8 +35,8 @@ const browserDfd = chromium.executablePath
 /**
  * Generate a report for an enqueued message.
  *
- * @param {{ url: string, config?: { wait?: number, standard?: string } }} data Enqueued message data.
- * @returns {Promise<{ report: object, screenshot: Buffer, fullPageScreenshot: Buffer }>}
+ * @param {{ url: string, config?: { wait?: number, standard?: Standard } }} data Enqueued message data.
+ * @returns {Promise<{ report: Report, screenshot: Buffer, fullPageScreenshot: Buffer }>}
  */
 const newReport = async ({ url, config = {} }) => {
   // Open new page.
@@ -49,6 +55,8 @@ const newReport = async ({ url, config = {} }) => {
 
     console.time('Report');
     const report = await pa11y(url, config);
+    report.timestamp = Date.now();
+    report.standard = config.standard;
     report.counts = report.issues.reduce(
       (counts, issue) => {
         counts[issue.type]++;
@@ -82,12 +90,12 @@ const newReport = async ({ url, config = {} }) => {
  * Save report and screenshot to S3.
  *
  * @param {stromg} id Report ID.
- * @param {object} report Report data.
+ * @param {Report} report Report data.
  * @param {Buffer} screenshot Screenshot binary data.
  * @param {Buffer} fullPagescreenshot Full-page screenshot binary data.
  * @returns {Promise<{ report: string, screenshot: string, fullPageScreenshot: string }>}
  */
-const saveReport = async (id, report, screenshot, fullPageScreenshot) => {
+const uploadReport = async (id, report, screenshot, fullPageScreenshot) => {
   const reportKey = `reports/${id}.json`;
   const screenshotKey = `screenshots/${id}.png`;
   const fullPageScreenshotKey = `screenshots/${id}-full.png`;
@@ -119,6 +127,32 @@ const saveReport = async (id, report, screenshot, fullPageScreenshot) => {
 };
 
 /**
+ * Update report info in DynamoDB.
+ *
+ * @param {{ id: string, report?: Report, error?: Error }} data Report data.
+ * @returns {Promise<void>}
+ */
+const updateInfo = async ({ id, report, error }) => {
+  if (error) {
+    await DDB.update({
+      TableName: REPORTS_TABLE,
+      Key: { Id: id },
+      UpdateExpression: 'SET ReportError = :error',
+      ExpressionAttributeValues: { ':error': error },
+    }).promise();
+
+    return;
+  }
+
+  await DDB.update({
+    TableName: REPORTS_TABLE,
+    Key: { Id: id },
+    UpdateExpression: 'SET CompletedTimestamp = :timestamp, Issues = :issues, Standard = :standard',
+    ExpressionAttributeValues: { ':timestamp': report.timestamp, ':issues': report.counts, ':standard': report.standard },
+  }).promise();
+};
+
+/**
  * Generate reports for one or more enqueued messages.
  *
  * @param {{ Records: { body: string }[] }} event SQS messages.
@@ -129,25 +163,29 @@ exports.handler = (event) => Promise.all(
     const data = JSON.parse(message.body);
     try {
       const { report, screenshot, fullPageScreenshot } = await newReport(data);
-      const files = await saveReport(data.id, report, screenshot, fullPageScreenshot);
+      const files = await uploadReport(data.id, report, screenshot, fullPageScreenshot);
       delete report.issues; // Report was saved to S3. For SNS only keep aggregate data.
       data.report = report;
       data.files = files;
     } catch (err) {
       console.error('Got error', err);
-      data.error = err;
+      data.error = err.message;
+      if (/net::[a-zA-Z0-9_]+/.test(err.message)) {
+        data.error = /(net::[a-zA-Z0-9_]+)/.exec(err.message)[0];
+      }
     }
 
-    const attributes = {};
-    if (data.source) {
-      attributes.source = { DataType: 'String', StringValue: data.source };
-    }
+    console.time('Update info');
+    await updateInfo(data);
+    console.timeEnd('Update info');
 
     console.time('Publish message');
     await SNS.publish({
       TopicArn: SNS_TOPIC,
       Message: JSON.stringify(data),
-      MessageAttributes: attributes,
+      MessageAttributes: {
+        source: { DataType: 'String', StringValue: data.source },
+      },
     }).promise();
     console.timeEnd('Publish message');
 

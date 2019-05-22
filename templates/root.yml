@@ -126,6 +126,20 @@ Resources:
           MinimumProtocolVersion: 'TLSv1.1_2016'
           SslSupportMethod: 'sni-only'
 
+  ######################################################
+  ### Table where reports information will be stored ###
+  ######################################################
+  ReportsTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: 'Id'
+          AttributeType: 'S'
+      KeySchema:
+        - AttributeName: 'Id'
+          KeyType: 'HASH'
+      BillingMode: 'PAY_PER_REQUEST'
+
   ##########################################
   ### Bucket where to store reports data ###
   ##########################################
@@ -224,6 +238,10 @@ Resources:
                 Resource:
                   - !Sub '${ReportsBucket.Arn}/reports/*'
                   - !Sub '${ReportsBucket.Arn}/screenshots/*'
+              - Sid: 'UpdateInfo'
+                Effect: 'Allow'
+                Action: 'dynamodb:UpdateItem'
+                Resource: !GetAtt 'ReportsTable.Arn'
               - Sid: 'PublishNotification'
                 Effect: 'Allow'
                 Action: 'sns:Publish'
@@ -237,13 +255,14 @@ Resources:
       Description: !Sub 'Consume tweet queue messages for ${AWS::StackName}.'
       Environment:
         Variables:
+          REPORTS_TABLE: !Ref 'ReportsTable'
           S3_BUCKET: !Ref 'ReportsBucket'
           SNS_TOPIC: !Ref 'ReportsReadyTopic'
       Handler: 'index.handler'
       Role: !GetAtt 'ReportRole.Arn'
       Runtime: 'nodejs8.10'
       MemorySize: 1024
-      Timeout: 15
+      Timeout: 30
   ReportFunctionEventSourceMapping:
     Type: 'AWS::Lambda::EventSourceMapping'
     Properties:
@@ -268,14 +287,18 @@ Resources:
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
       Policies:
-        - PolicyName: 'SQS'
+        - PolicyName: 'RequestReport'
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
-              - Sid: 'EnqueueReports'
+              - Sid: 'EnqueueRequest'
                 Effect: 'Allow'
                 Action: 'sqs:SendMessage'
                 Resource: !GetAtt 'ReportsQueue.Arn'
+              - Sid: 'SaveInfo'
+                Effect: 'Allow'
+                Action: 'dynamodb:PutItem'
+                Resource: !GetAtt 'ReportsTable.Arn'
   ReportEnqueueFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
@@ -285,6 +308,7 @@ Resources:
       Description: !Sub 'Handle report generation requests for ${AWS::StackName}.'
       Environment:
         Variables:
+          REPORTS_TABLE: !Ref 'ReportsTable'
           REPORTS_QUEUE: !Ref 'ReportsQueue'
       Handler: 'index.handler'
       Role: !GetAtt 'ReportEnqueueRole.Arn'
@@ -319,8 +343,14 @@ Resources:
             Statement:
               - Sid: 'DownloadReportData'
                 Effect: 'Allow'
-                Action: 's3:GetObject'
+                Action:
+                  - 's3:GetObject'
+                  - 's3:HeadObject'
                 Resource: !Sub '${ReportsBucket.Arn}/reports/*'
+              - Sid: 'GetInfo'
+                Effect: 'Allow'
+                Action: 'dynamodb:GetItem'
+                Resource: !GetAtt 'ReportsTable.Arn'
   ReportViewFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
@@ -328,6 +358,7 @@ Resources:
       Description: !Sub 'Handle report view requests for ${AWS::StackName}.'
       Environment:
         Variables:
+          REPORTS_TABLE: !Ref 'ReportsTable'
           S3_BUCKET: !Ref 'ReportsBucket'
           HOSTNAME: !Ref 'Hostname'
       Handler: 'index.handler'
@@ -391,14 +422,18 @@ Resources:
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
       Policies:
-        - PolicyName: 'SQS'
+        - PolicyName: 'RequestReport'
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
-              - Sid: 'EnqueueReports'
+              - Sid: 'EnqueueRequest'
                 Effect: 'Allow'
                 Action: 'sqs:SendMessage'
                 Resource: !GetAtt 'ReportsQueue.Arn'
+              - Sid: 'SaveInfo'
+                Effect: 'Allow'
+                Action: 'dynamodb:BatchWriteItem'
+                Resource: !GetAtt 'ReportsTable.Arn'
   TwitterWebhookFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
@@ -408,6 +443,7 @@ Resources:
       Description: !Sub 'Handle Twitter webhook events for ${AWS::StackName}.'
       Environment:
         Variables:
+          REPORTS_TABLE: !Ref 'ReportsTable'
           REPORTS_QUEUE: !Ref 'ReportsQueue'
           CONSUMER_SECRET: !Ref 'ConsumerSecret'
       Handler: 'index.handler'
@@ -515,12 +551,18 @@ Resources:
                     schema:
                       $ref: '#/components/schemas/ReportGenerationRequest'
               responses:
-                '201':
+                '202':
                   description: 'Report enqueued.'
                   content:
                     application/json:
                       schema:
                         $ref: '#/components/schemas/ReportGenerationResponse'
+                '400':
+                  description: 'Report enqueued.'
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/ErrorResponse'
               x-amazon-apigateway-integration:
                 type: 'aws'
                 httpMethod: 'POST'
@@ -529,10 +571,37 @@ Resources:
                   application/json: '$input.json("$")'
                 responses:
                   default:
-                    statusCode: 201
+                    statusCode: 202
                     responseTemplates:
                       application/json: '$input.json("$")'
+                  '.*Invalid URL.*':
+                    statusCode: 400
+                    responseTemplate:
+                      application/json: '{ "message": "Invalid URL" }'
           /reports/{id}:
+            head:
+              description: 'Check report status.'
+              x-amazon-apigateway-request-validator: 'all'
+              parameters:
+                - in: 'path'
+                  name: 'id'
+                  schema:
+                    type: 'string'
+                  description: 'Report ID.'
+                  required: true
+              responses:
+                '200':
+                  description: 'Report ready.'
+                '204':
+                  description: 'Report not yet ready.'
+                '404':
+                  description: 'Report not found.'
+                '422':
+                  description: 'Report could not be generated due to the resource being unreachable.'
+              x-amazon-apigateway-integration:
+                type: 'aws_proxy'
+                httpMethod: 'POST'
+                uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ReportViewFunction.Arn}/invocations'
             get:
               description: 'View report.'
               x-amazon-apigateway-request-validator: 'all'
@@ -553,9 +622,13 @@ Resources:
                   description: 'Report format.'
               responses:
                 '200':
-                  description: 'Report.'
+                  description: 'Report ready.'
+                '204':
+                  description: 'Report not yet ready.'
                 '404':
                   description: 'Report not found.'
+                '422':
+                  description: 'Report could not be generated due to the resource being unreachable.'
               x-amazon-apigateway-integration:
                 type: 'aws_proxy'
                 httpMethod: 'POST'

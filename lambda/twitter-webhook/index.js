@@ -1,10 +1,13 @@
 const crypto = require('crypto');
+const { URL } = require('url');
 const AWS = require('aws-sdk');
 const uuid4 = require('uuid/v4');
 
+const REPORTS_TABLE = process.env.REPORTS_TABLE;
 const REPORTS_QUEUE = process.env.REPORTS_QUEUE;
 const CONSUMER_SECRET = process.env.CONSUMER_SECRET;
 
+const DDB = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
 const SQS = new AWS.SQS({ apiVersion: '2012-11-05' });
 
 /**
@@ -52,7 +55,7 @@ exports.handler = async ({ signature, body }) => {
 
   // Filter tweets, and prepare messages to be sent to queue.
   const currentUserId = data.for_user_id;
-  const messages = data.tweet_create_events
+  const tweets = data.tweet_create_events
     .filter((tweet) => {
       if (tweet.is_quote_status || tweet.retweeted_status) {
         // Ignore retweets and quoted tweets.
@@ -73,17 +76,40 @@ exports.handler = async ({ signature, body }) => {
       return true;
     })
     .map((tweet) => ({
-      Id: tweet.id_str,
-      MessageBody: JSON.stringify({ id: uuid4(), url: tweet.entities.urls[0].expanded_url, tweet, source: 'twitter' }),
+      id: uuid4(),
+      date: new Date(tweet.created_at),
+      author: `@${tweet.user.screen_name}`,
+      url: new URL(tweet.entities.urls[0].expanded_url),
+      tweet,
     }));
-
-  if (messages.length === 0) {
+  if (tweets.length === 0) {
     // Nothing to do.
     return;
   }
 
+  // Save info to DynamoDB.
+  const items = tweets.map(({ id, date, author, url }) => ({
+    PutRequest: {
+      Item: {
+        Id: id,
+        Url: url.toString(),
+        Hostname: url.hostname,
+        Requester: author,
+        Timestamp: date.valueOf(),
+        Source: 'twitter',
+      },
+    },
+  }));
+  console.time('Save info');
+  await DDB.batchWrite({ RequestItems: { [REPORTS_TABLE]: items } }).promise();
+  console.timeEnd('Save info');
+
   // Send messages to queue.
-  console.time('Send messages');
+  const messages = tweets.map(({ id, url, tweet }) => ({
+    Id: tweet.id_str,
+    MessageBody: JSON.stringify({ id, url, tweet, source: 'twitter' }),
+  }));
+  console.time('Enqueue requests');
   await SQS.sendMessageBatch({ QueueUrl: REPORTS_QUEUE, Entries: messages }).promise();
-  console.timeEnd('Send messages');
+  console.timeEnd('Enqueue requests');
 };
