@@ -33,6 +33,34 @@ const checkSignature = (signature, payload, consumerSecret) => {
 };
 
 /**
+ * Remove duplicates from tweets list.
+ *
+ * @param {{ tweet: { id_str: string } }[]} tweets Array of tweets.
+ * @returns {Promise<{ tweet: { id_str: string } }[]>}
+ */
+const dedupeTweets = async (tweets) => {
+  const tweetIds = tweets.map(({ tweet }) => tweet.id_str);
+  const keyCondExpr = tweetIds.map((_, idx) => `TweetId = :tweetId${idx}`).join(' OR ');
+  const exprAttrValues = tweetIds.reduce((map, tweetId, idx) => {
+    map[`:tweetId${idx}`] = tweetId;
+
+    return map;
+  }, {});
+
+  console.time('Query database');
+  const found = await DDB.query({
+    TableName: REPORTS_TABLE,
+    IndexName: 'TweetId',
+    KeyConditionExpression: keyCondExpr,
+    ExpressionAttributeValues: exprAttrValues,
+  }).promise();
+  console.timeEnd('Query database');
+  const alreadyEnqueuedTweetIds = found.Items.map((item) => item.TweetId);
+
+  return tweets.filter(({ tweet }) => !alreadyEnqueuedTweetIds.includes(tweet.id_str));
+};
+
+/**
  * Send report generation requests received via Twitter to SQS queue.
  *
  * @param {{ signature: string, body: string }} event Twitter payload.
@@ -55,7 +83,7 @@ exports.handler = async ({ signature, body }) => {
 
   // Filter tweets, and prepare messages to be sent to queue.
   const currentUserId = data.for_user_id;
-  const tweets = data.tweet_create_events
+  let tweets = data.tweet_create_events
     .filter((tweet) => {
       if (tweet.is_quote_status || tweet.retweeted_status) {
         // Ignore retweets and quoted tweets.
@@ -87,11 +115,20 @@ exports.handler = async ({ signature, body }) => {
     return;
   }
 
+  // Remove tweets that had already been enqueued.
+  // This is useful in case the webhook is called twice with the same payload.
+  tweets = await dedupeTweets(tweets);
+  if (tweets.length === 0) {
+    // Nothing to do.
+    return;
+  }
+
   // Save info to DynamoDB.
-  const items = tweets.map(({ id, date, author, url }) => ({
+  const items = tweets.map(({ id, date, author, url, tweet }) => ({
     PutRequest: {
       Item: {
         Id: id,
+        TweetId: tweet.id_str,
         Url: url.toString(),
         Hostname: url.hostname,
         Requester: author,
