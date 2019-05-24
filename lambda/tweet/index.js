@@ -1,10 +1,6 @@
-const AWS = require('aws-sdk');
 const Twit = require('twit');
 
-const S3_BUCKET = process.env.S3_BUCKET;
 const HOSTNAME = process.env.HOSTNAME;
-
-const S3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 /** @typedef {'notice' | 'warning' | 'error'} IssueType */
 /** @typedef {{ issues: { type: IssueType }[], counts: { [x in IssueType]: number } }} Report */
