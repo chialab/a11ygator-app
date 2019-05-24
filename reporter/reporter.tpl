@@ -8,7 +8,7 @@
   <meta name="twitter:title" content="<%= data.twitterTitle %>">
   <meta name="twitter:image" content="<%= data.twitterImage %>">
   <meta name="twitter:description" content="by A11ygator">
-  <link rel="icon" type="image/png" href="./favicon.png">
+  <link rel="icon" type="image/png" href="/favicon.png">
 	<title>A11ygator - Accessibility report for "<%= data.documentTitle %>"</title>
 </head>
 <body>

@@ -9,7 +9,7 @@
 	((__t = ( data.twitterTitle )) == null ? '' : __t) +
 	'">\n  <meta name="twitter:image" content="' +
 	((__t = ( data.twitterImage )) == null ? '' : __t) +
-	'">\n  <meta name="twitter:description" content="by A11ygator">\n  <link rel="icon" type="image/png" href="./favicon.png">\n	<title>A11ygator - Accessibility report for "' +
+	'">\n  <meta name="twitter:description" content="by A11ygator">\n  <link rel="icon" type="image/png" href="/favicon.png">\n	<title>A11ygator - Accessibility report for "' +
 	((__t = ( data.documentTitle )) == null ? '' : __t) +
 	'"</title>\n</head>\n<body>\n\n	<div class="pa11y-report">\n		<style>' +
 	((__t = ( data.css )) == null ? '' : __t) +
