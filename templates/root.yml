@@ -511,15 +511,6 @@ Resources:
             Action: 'sts:AssumeRole'
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-      Policies:
-        - PolicyName: 'Screenshots'
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Sid: 'DownloadScreenshots'
-                Effect: 'Allow'
-                Action: 's3:GetObject'
-                Resource: !Sub '${ReportsBucket.Arn}/screenshots/*'
   TweetFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
@@ -533,13 +524,11 @@ Resources:
           CONSUMER_SECRET: !Ref 'ConsumerSecret'
           OAUTH_TOKEN: !Ref 'OAuthToken'
           OAUTH_TOKEN_SECRET: !Ref 'OAuthTokenSecret'
-          S3_BUCKET: !Ref 'ReportsBucket'
           HOSTNAME: !Ref 'Hostname'
       Handler: 'index.handler'
       Role: !GetAtt 'TweetRole.Arn'
       Runtime: 'nodejs10.x'
-      MemorySize: 320
-      Timeout: 10
+      Timeout: 5
   TweetFunctionPermission:
     Type: 'AWS::Lambda::Permission'
     Properties:

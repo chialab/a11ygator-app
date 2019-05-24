@@ -26,4 +26,4 @@ Infrastructure
 
 * Report generation requests are saved in DynamoDB and sent to a SNS Queue.
 * Enqueued messages are consumed by a Lambda function that loads the URL, waits for the configured amount of time, and runs Pa11y with the configured standard, then takes two screenshots (viewport and full-page), uploads the screenshots and the report JSON to an S3 bucket, updates the information saved in DynamoDB, and sends a notification to a SNS Topic.
-* A Lambda function is listening for notifications of generated reports that were requested via Twitter, and tweets a reply by uploading the viewport screenshot to Twitter and attaching it to a Tweet that contains aggregate data and a link to the HTML report.
+* A Lambda function is listening for notifications of generated reports that were requested via Twitter, and tweets a reply that contains aggregate data and a link to the HTML report.

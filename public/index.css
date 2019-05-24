@@ -197,12 +197,12 @@ select:-webkit-autofill:focus {
 .signature {
     display: flex;
     justify-content: flex-end;
+    font-size: 0.75em;
+    color: black;
 }
 
 .signature a {
     text-decoration: none;
-    color: black;
-    font-size: 0.75em;
 }
 
 .signature span {

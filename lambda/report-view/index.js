@@ -24,12 +24,12 @@ class ReportNotFoundError extends Error {
 }
 
 /**
- * Check if report is ready.
+ * Get report info from database.
  *
  * @param {string} id Report ID.
- * @returns {Promise<boolean>}
+ * @returns {Promise<{ Id: string, Source: 'api' | 'twitter', Url: string, Hostname: string, CompletedTimestamp?: number, Requester?: string }>}
  */
-const isReportReady = async (id) => {
+const getReportInfo = async (id) => {
   console.time('Get info');
   const info = await DDB.get({ TableName: REPORTS_TABLE, Key: { Id: id } }).promise();
   console.timeEnd('Get info');
@@ -41,7 +41,7 @@ const isReportReady = async (id) => {
     throw new Error(info.Item.ReportError);
   }
 
-  return !!info.Item.CompletedTimestamp;
+  return info.Item;
 };
 
 /**
@@ -73,8 +73,8 @@ exports.handler = async (event) => {
   const headers = { 'Content-Type': CONTENT_TYPE[format] };
 
   try {
-    const isReady = await isReportReady(id);
-    if (!isReady) {
+    const info = await getReportInfo(id);
+    if (!info.CompletedTimestamp) {
       return {
         statusCode: 204,
         headers: {
@@ -90,7 +90,10 @@ exports.handler = async (event) => {
       const report = await getReport(id);
       body = JSON.stringify(report);
       if (format === 'html') {
+        report.jsonPath = `https://${HOSTNAME}/api/reports/${id}?format=json`;
         report.screenPath = `https://${HOSTNAME}/screenshots/${id}-full.png`;
+        report.twitterTitle = info.Source === 'twitter' ? `Accessibility report for ${info.Requester}` : `Accessibility report for ${info.Url}`;
+        report.twitterImage = `https://${HOSTNAME}/screenshots/${id}.png`;
         body = await htmlReporter.results(report);
       }
     }

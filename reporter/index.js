@@ -21,6 +21,9 @@ report.results = async results => {
         issues: results.issues,
         pageUrl: results.pageUrl,
         screenPath: results.screenPath,
+        twitterTitle: results.twitterTitle,
+        twitterImage: results.twitterImage,
+        jsonPath: results.jsonPath,
 
         // Issue counts
         errorCount: results.issues.filter(issue => issue.type === 'error').length,
