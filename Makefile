@@ -37,6 +37,7 @@ deploy: package
 		--profile $(DEPLOY_PROFILE)
 
 package: validate
+	yarn run build-reporter
 	aws cloudformation package \
 		--template-file templates/root.yml \
 		--output-template-file $(PACKAGE_TEMPLATE) \
