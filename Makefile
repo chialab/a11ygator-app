@@ -1,10 +1,12 @@
 all: deploy app
 .PHONY: app layers deploy package validate
 
-STACK_NAME := A11ygatorBot
+PROJECT := A11ygator
+ENVIRONMENT ?= Test
+STACK_NAME ?= A11ygatorApp$(ENVIRONMENT)
 PACKAGE_TEMPLATE := template.yml
 PACKAGE_BUCKET ?= chialab-cloudformation-templates
-PACKAGE_PREFIX ?= chialab/a11ygator-bot
+PACKAGE_PREFIX ?= chialab/a11ygator-app/$(shell git symbolic-ref --short HEAD)
 
 PACKAGE_PROFILE ?= chialabsrl
 DEPLOY_PROFILE ?= chialab
@@ -33,6 +35,7 @@ deploy: package
 	aws cloudformation deploy \
 		--template-file template.yml \
 		--stack-name $(STACK_NAME) \
+		--tags Project=$(PROJECT) Environment=$(ENVIRONMENT) \
 		--capabilities CAPABILITY_IAM \
 		--profile $(DEPLOY_PROFILE)
 
