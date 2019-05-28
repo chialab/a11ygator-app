@@ -1,7 +1,0 @@
-/dist
-/gcp.zip
-/node_modules
-/screenshots/*
-!/screenshots/.gitkeep
-
-\.vscode/
