@@ -23,55 +23,21 @@ Simply type an URL and choose the WCAG standard.
 🚀Now also available as Browser Extension! Check out <a href="https://chrome.google.com/webstore/detail/a11ygator/imfmlpemomjmfncnmkjdeeinbkichaio">A11ygator for Chrome</a> and <a href="https://addons.mozilla.org/it/firefox/addon/a11ygator">A11ygator for Firefox</a>.
 
 
-## Awake the A11ygator
+## Meet the A11ygator
 
-Requirements
+Navigate to `http://a11ygator.chialab.io` and start to test every website you want.
 
-* [Node JS](https://nodejs.org/) (>= 8.0.0)
-* [Yarn](https://yarnpkg.com/)
+A11ygator is also a Twitter user (and fan). Just mention [@reala11ygator](https://twitter.com/reala11ygator) followed by a valid website address: soon the A11ygator will answer you.
 
-Run the server
+## How it works
 
-```.sh
-yarn install
-yarn build
-yarn start
-```
+A11ygator infrastructure is documentated [here](./docs/infrastructure.md).
 
-In local environment, navigate with the browser to **`https://localhost:3000/`** to visualize the app.
+In this repository you can find source code for A11ygator web app and Twitter bot.
 
-## API Usage
+## Learn more
 
-It is also possible to directly use `A11ygator` without filling the form.
-
-To get a raw JSON report with default options, make a GET call to
-
-```http
-GET /report?url=<site-to-test> HTTP/1.1
-```
-
-To get an HTML report just add query param 'format'
-
-```http
-GET /report?url=<site-to-test&format=html> HTTP/1.1
-```
-
-To pass options, make a POST call embedding them on the request's body.
-
-Example:
-
-```http
-POST /report?url=<site-to-test> HTTP/1.1
-Content-Type: application/json
-{
-    "wait": 5000,
-    "timeout": 8000
-}
-```
-
-## More
-
-Also check out [A11ygator Extension repository](https://github.com/chialab/a11ygator-extension).
+Now we have also the official browsers extension. Check out the [A11ygator Extension repository](https://github.com/chialab/a11ygator-extension).
 
 ## Credits
 
