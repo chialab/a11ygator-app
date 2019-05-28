@@ -1,0 +1,29 @@
+{
+  "name": "@chialab/a11ygator-app",
+  "private": true,
+  "version": "1.0.0",
+  "description": "A Web dashboard and Twitter bot for accessibility tests.",
+  "homepage": "https://a11ygator.chialab.io/",
+  "repository": "github:chialab/a11ygator-app",
+  "bugs": {
+    "url": "https://github.com/chialab/a11ygator-app/issues"
+  },
+  "scripts": {
+    "build-reporter": "rollup reporter/index.js --name 'Reporter' --file lambda/report-view/reporter.js --config"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.441.0",
+    "chrome-aws-lambda": "^1.14.0",
+    "pa11y": "github:edoardocavazza/pa11y",
+    "puppeteer": "^1.14.0",
+    "twit": "^2.2.11",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "rollup": "^0.66.2",
+    "rollup-plugin-commonjs": "^9.1.8",
+    "rollup-plugin-jst": "^1.2.0",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "rollup-plugin-string": "^2.0.2"
+  }
+}
