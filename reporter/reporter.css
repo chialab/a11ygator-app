@@ -34,7 +34,7 @@
 
 .pa11y-report pre {
     margin: 0;
-    padding: 0 1rem 1rem 1rem;
+    padding: 0 0.5rem 0 0.5rem;
     margin-top: 1rem;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 2px;
@@ -67,10 +67,15 @@
     border-width: 2px 0 0 0;
 }
 
+.pa11y-report footer p {
+  font-size: 0.75em;
+}
+
 .pa11y-report footer {
     display: flex;
     flex-direction: row;
     color: #999;
+    font-size: 1.25em;
 }
 
 .pa11y-report footer > *:first-child {
@@ -98,11 +103,23 @@
     word-break: break-all;
 }
 
+.pa11y-report .issue-title {
+  font-size: 1.25em;
+}
+
 .pa11y-report .results-list {
     margin-left: 0;
     padding-left: 0;
     list-style: none;
     margin-top: 1rem;
+}
+
+.pa11y-report .results-list .issue-rule {
+  font-size: 0.85em;
+}
+
+.pa11y-report .results-list .issue-code {
+  font-size: 1.25em;
 }
 
 .pa11y-report .result {
@@ -173,18 +190,20 @@
 
 .report-title-container h1 {
     margin: 0;
+    font-size: 2em;
 }
 
 .download-report {
-    margin-left: 1em;
-    color: #fff;
-    padding: 0.75em 1em;
-    text-decoration: none;
-    background-color: #42513f;
-    border: 0;
-    border-radius: 2px;
-    cursor: pointer;
-    transition: all 150ms ease-out;
+  font-size: 1.5em;
+  margin-left: 1em;
+  color: #fff;
+  padding: 0.75em 1em;
+  text-decoration: none;
+  background-color: #42513f;
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 150ms ease-out;
 }
 
 .download-report:hover {
