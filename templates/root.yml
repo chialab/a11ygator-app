@@ -225,7 +225,7 @@ Resources:
           "States": {
             "WaitUntil": {
               "Type": "Wait",
-              "TimestampPath": "$.start_time",
+              "TimestampPath": "$.scheduled_from",
               "Next": "EnqueueRequest"
             },
             "EnqueueRequest": {
@@ -373,6 +373,10 @@ Resources:
                 Effect: 'Allow'
                 Action: 'sqs:SendMessage'
                 Resource: !GetAtt 'ReportsQueue.Arn'
+              - Sid: 'ScheduleRequest'
+                Effect: 'Allow'
+                Action: 'states:StartExecution'
+                Resource: !Ref 'ScheduledReportsStateMachine'
               - Sid: 'SaveInfo'
                 Effect: 'Allow'
                 Action: 'dynamodb:PutItem'
@@ -388,6 +392,7 @@ Resources:
         Variables:
           REPORTS_TABLE: !Ref 'ReportsTable'
           REPORTS_QUEUE: !Ref 'ReportsQueue'
+          SCHEDULED_REPORTS_STATE_MACHINE: !Ref 'ScheduledReportsStateMachine'
       Handler: 'index.handler'
       Role: !GetAtt 'ReportEnqueueRole.Arn'
       Runtime: 'nodejs10.x'
@@ -788,6 +793,9 @@ Resources:
                 url:
                   type: 'string'
                   format: 'url'
+                schedule:
+                  type: 'string'
+                  format: 'date-time'
                 config:
                   type: 'object'
                   properties:
