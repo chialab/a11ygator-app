@@ -24,7 +24,7 @@ const formatMessage = (id, report) => {
   console.log(`Report: ${counts.error} ERRORS / ${counts.warning} WARNINGS / ${counts.notice} NOTICES`);
 
   // TODO differentiate message for high/medium/low number of errors
-  return `Here's your report!\nI found ${counts.notice} notices, ${counts.warning} warnings, ${counts.error} errors.\nVisit the link below to access the complete report https://${HOSTNAME}/api/reports/${id}?format=html`;
+  return `Here's your report!\nI found ${counts.error} errors, ${counts.warning} warnings, ${counts.notice} notices.\nVisit the link below to access the complete report https://${HOSTNAME}/api/reports/${id}?format=html`;
 };
 
 /**
