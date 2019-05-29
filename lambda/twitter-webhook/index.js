@@ -85,8 +85,8 @@ exports.handler = async ({ signature, body }) => {
   const currentUserId = data.for_user_id;
   let tweets = data.tweet_create_events
     .filter((tweet) => {
-      if (tweet.is_quote_status || tweet.retweeted_status) {
-        // Ignore retweets and quoted tweets.
+      if (currentUserId === tweet.user.id_str) {
+        // Ignore A11ygator tweets quoting himself.
         return false;
       }
 
