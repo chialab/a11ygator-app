@@ -20,7 +20,7 @@ const PA11Y_CONFIG = {
   includeWarnings: true,
   standard: 'WCAG2AA',
   wait: 2000,
-  timeout: 10000,
+  timeout: 15000,
   log: {
     debug: console.log.bind(console, '[Pa11y | Debug]'),
     error: console.error.bind(console, '[Pa11y | Error]'),
