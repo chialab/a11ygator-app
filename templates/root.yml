@@ -193,6 +193,53 @@ Resources:
             Effect: 'Allow'
             Resource: !Sub '${ReportsBucket.Arn}/screenshots/*'
 
+  ###########################################
+  ### State machine for scheduled reports ###
+  ###########################################
+  ScheduledReportsRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'states.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      Policies:
+        - PolicyName: 'EnqueueReport'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: 'EnqueueRequest'
+                Effect: 'Allow'
+                Action: 'sqs:SendMessage'
+                Resource: !GetAtt 'ReportsQueue.Arn'
+  ScheduledReportsStateMachine:
+    Type: 'AWS::StepFunctions::StateMachine'
+    Properties:
+      RoleArn: !GetAtt 'ScheduledReportsRole.Arn'
+      DefinitionString: !Sub |-
+        {
+          "StartAt": "WaitUntil",
+          "States": {
+            "WaitUntil": {
+              "Type": "Wait",
+              "TimestampPath": "$.scheduled_from",
+              "Next": "EnqueueRequest"
+            },
+            "EnqueueRequest": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::sqs:sendMessage",
+              "Parameters": {
+                "QueueUrl": "${ReportsQueue}",
+                "MessageBody.$": "$.message"
+              },
+              "End": true
+            }
+          }
+        }
+
   #####################################
   ### Queue for reports to generate ###
   #####################################
@@ -326,6 +373,10 @@ Resources:
                 Effect: 'Allow'
                 Action: 'sqs:SendMessage'
                 Resource: !GetAtt 'ReportsQueue.Arn'
+              - Sid: 'ScheduleRequest'
+                Effect: 'Allow'
+                Action: 'states:StartExecution'
+                Resource: !Ref 'ScheduledReportsStateMachine'
               - Sid: 'SaveInfo'
                 Effect: 'Allow'
                 Action: 'dynamodb:PutItem'
@@ -341,6 +392,7 @@ Resources:
         Variables:
           REPORTS_TABLE: !Ref 'ReportsTable'
           REPORTS_QUEUE: !Ref 'ReportsQueue'
+          SCHEDULED_REPORTS_STATE_MACHINE: !Ref 'ScheduledReportsStateMachine'
       Handler: 'index.handler'
       Role: !GetAtt 'ReportEnqueueRole.Arn'
       Runtime: 'nodejs10.x'
@@ -741,6 +793,9 @@ Resources:
                 url:
                   type: 'string'
                   format: 'url'
+                schedule:
+                  type: 'string'
+                  format: 'date-time'
                 config:
                   type: 'object'
                   properties:
