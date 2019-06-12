@@ -29,7 +29,7 @@ exports.handler = async ({ url, schedule, config }) => {
     Url: url.toString(),
     Hostname: hostname,
     Timestamp: timestamp,
-    ScheduledTimestamp = scheduledFrom.valueOf(),
+    ScheduledTimestamp: scheduledFrom.valueOf(),
     Source: source,
   };
   console.time('Save info');
