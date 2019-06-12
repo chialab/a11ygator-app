@@ -43,7 +43,7 @@ exports.handler = async ({ url, schedule, config }) => {
   await StepFunctions.startExecution({
     name: id,
     stateMachineArn: SCHEDULED_REPORTS_STATE_MACHINE,
-    input: JSON.stringify({ scheduled_from: scheduledFrom.toISOString(), message }),
+    input: JSON.stringify({ scheduledFrom, message }),
   }).promise();
   console.timeEnd('Schedule report');
 
