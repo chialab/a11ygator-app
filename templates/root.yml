@@ -225,7 +225,7 @@ Resources:
           "States": {
             "WaitUntil": {
               "Type": "Wait",
-              "TimestampPath": "$.scheduled_from",
+              "TimestampPath": "$.scheduledFrom",
               "Next": "EnqueueRequest"
             },
             "EnqueueRequest": {
@@ -373,10 +373,6 @@ Resources:
                 Effect: 'Allow'
                 Action: 'sqs:SendMessage'
                 Resource: !GetAtt 'ReportsQueue.Arn'
-              - Sid: 'ScheduleRequest'
-                Effect: 'Allow'
-                Action: 'states:StartExecution'
-                Resource: !Ref 'ScheduledReportsStateMachine'
               - Sid: 'SaveInfo'
                 Effect: 'Allow'
                 Action: 'dynamodb:PutItem'
@@ -392,7 +388,6 @@ Resources:
         Variables:
           REPORTS_TABLE: !Ref 'ReportsTable'
           REPORTS_QUEUE: !Ref 'ReportsQueue'
-          SCHEDULED_REPORTS_STATE_MACHINE: !Ref 'ScheduledReportsStateMachine'
       Handler: 'index.handler'
       Role: !GetAtt 'ReportEnqueueRole.Arn'
       Runtime: 'nodejs10.x'
@@ -454,6 +449,56 @@ Resources:
       Action: 'lambda:InvokeFunction'
       Principal: 'apigateway.amazonaws.com'
       SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/*/GET/reports/*'
+
+  #######################################################
+  ### Function to schedule report generation requests ###
+  #######################################################
+  ReportScheduleRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: 'ScheduleReport'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: 'ScheduleRequest'
+                Effect: 'Allow'
+                Action: 'states:StartExecution'
+                Resource: !Ref 'ScheduledReportsStateMachine'
+              - Sid: 'SaveInfo'
+                Effect: 'Allow'
+                Action: 'dynamodb:PutItem'
+                Resource: !GetAtt 'ReportsTable.Arn'
+  ReportScheduleFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Layers:
+        - !Ref 'UuidLayer'
+      Code: '../lambda/report-schedule'
+      Description: !Sub 'Schedule report generation requests for ${AWS::StackName}.'
+      Environment:
+        Variables:
+          REPORTS_TABLE: !Ref 'ReportsTable'
+          SCHEDULED_REPORTS_STATE_MACHINE: !Ref 'ScheduledReportsStateMachine'
+      Handler: 'index.handler'
+      Role: !GetAtt 'ReportScheduleRole.Arn'
+      Runtime: 'nodejs10.x'
+  ReportScheduleFunctionPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !GetAtt 'ReportScheduleFunction.Arn'
+      Action: 'lambda:InvokeFunction'
+      Principal: 'apigateway.amazonaws.com'
+      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/*/POST/schedules'
 
   ###########################################################
   ### Function to handle Twitter Challenge Response Check ###
@@ -595,7 +640,7 @@ Resources:
       Protocol: 'lambda'
       Endpoint: !GetAtt 'TweetFunction.Arn'
       FilterPolicy:
-        source: [ 'twitter' ]
+        source: [ 'twitter', 'schedule' ]
 
   ###################
   ### API Gateway ###
@@ -638,7 +683,7 @@ Resources:
                       schema:
                         $ref: '#/components/schemas/ReportGenerationResponse'
                 '400':
-                  description: 'Report enqueued.'
+                  description: 'Bad request.'
                   content:
                     application/json:
                       schema:
@@ -713,6 +758,45 @@ Resources:
                 type: 'aws_proxy'
                 httpMethod: 'POST'
                 uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ReportViewFunction.Arn}/invocations'
+          /schedules:
+            post:
+              description: 'Schedule report generation.'
+              security:
+                - sigv4: []
+              x-amazon-apigateway-request-validator: 'all'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/ReportScheduleRequest'
+              responses:
+                '202':
+                  description: 'Report scheduled.'
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/ReportScheduleResponse'
+                '400':
+                  description: 'Bad request.'
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/ErrorResponse'
+              x-amazon-apigateway-integration:
+                type: 'aws'
+                httpMethod: 'POST'
+                uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ReportScheduleFunction.Arn}/invocations'
+                requestTemplates:
+                  application/json: '$input.json("$")'
+                responses:
+                  default:
+                    statusCode: 202
+                    responseTemplates:
+                      application/json: '$input.json("$")'
+                  '.*Invalid URL.*':
+                    statusCode: 400
+                    responseTemplate:
+                      application/json: '{ "message": "Invalid URL" }'
           /webhook/twitter:
             get:
               description: 'Pass Twitter Challenge Response Check (CRC).'
@@ -787,7 +871,42 @@ Resources:
                 message:
                   type: 'string'
               required: [ 'message' ]
+            ReportConfig:
+              type: 'object'
+              properties:
+                wait:
+                  type: 'integer'
+                  minimum: 0
+                  maximum: 8000
+                standard:
+                  type: 'string'
+                  enum:
+                    - 'Section508'
+                    - 'WCAG2A'
+                    - 'WCAG2AA'
+                    - 'WCAG2AAA'
+              additionalProperties: no
             ReportGenerationRequest:
+              type: 'object'
+              properties:
+                url:
+                  type: 'string'
+                  format: 'url'
+                config:
+                  $ref: '#/components/schemas/ReportConfig'
+              required: [ 'url' ]
+              additionalProperties: no
+            ReportGenerationResponse:
+              type: 'object'
+              properties:
+                id:
+                  type: 'string'
+                url:
+                  type: 'string'
+                  format: 'url'
+              required: [ 'id', 'url' ]
+              additionalProperties: no
+            ReportScheduleRequest:
               type: 'object'
               properties:
                 url:
@@ -797,23 +916,10 @@ Resources:
                   type: 'string'
                   format: 'date-time'
                 config:
-                  type: 'object'
-                  properties:
-                    wait:
-                      type: 'integer'
-                      minimum: 0
-                      maximum: 8000
-                    standard:
-                      type: 'string'
-                      enum:
-                        - 'Section508'
-                        - 'WCAG2A'
-                        - 'WCAG2AA'
-                        - 'WCAG2AAA'
-                  additionalProperties: no
-              required: [ 'url' ]
+                  $ref: '#/components/schemas/ReportConfig'
+              required: [ 'url', 'schedule' ]
               additionalProperties: no
-            ReportGenerationResponse:
+            ReportScheduleResponse:
               type: 'object'
               properties:
                 id:
@@ -832,3 +938,10 @@ Resources:
               additionalProperties: no
             TwitterWebhookRequest:
               type: 'object'
+          securitySchemes:
+            sigv4:
+              type: 'apiKey'
+              name: 'Authorization'
+              in: 'header'
+              x-amazon-apigateway-authtype: 'awsSigv4'
+
