@@ -34,9 +34,12 @@ Parameters:
     Default: 'ERROR'
 
 Outputs:
-  TwitterWebhookUrl:
-    Description: 'URL of Twitter Webhook.'
-    Value: !Sub 'https://${Hostname}/api/webhook/twitter'
+  PublicUrl:
+    Description: 'URL of public Web application.'
+    Value: !Sub 'https://${Hostname}/'
+  AuthenticatedApiUrl:
+    Description: 'Base URL to make authenticated API requests.'
+    Value: !Sub 'https://${Api}.execute-api.${AWS::Region}.${AWS::URLSuffix}/api/'
   AppBucketName:
     Description: 'Name of bucket where HTML+JS file are stored.'
     Value: !Ref 'AppBucket'
@@ -109,15 +112,15 @@ Resources:
         IPV6Enabled: yes
         Origins:
           - Id: 'app'
-            DomainName: !Sub '${AppBucket}.s3-${AWS::Region}.amazonaws.com'
+            DomainName: !Sub '${AppBucket}.s3-${AWS::Region}.${AWS::URLSuffix}'
             S3OriginConfig:
               OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${OriginAccessIdentity}'
           - Id: 'screenshots'
-            DomainName: !Sub '${ReportsBucket}.s3-${AWS::Region}.amazonaws.com'
+            DomainName: !Sub '${ReportsBucket}.s3-${AWS::Region}.${AWS::URLSuffix}'
             S3OriginConfig:
               OriginAccessIdentity: !Sub 'origin-access-identity/cloudfront/${OriginAccessIdentity}'
           - Id: 'api'
-            DomainName: !Sub '${Api}.execute-api.${AWS::Region}.amazonaws.com'
+            DomainName: !Sub '${Api}.execute-api.${AWS::Region}.${AWS::URLSuffix}'
             CustomOriginConfig:
               OriginProtocolPolicy: 'https-only'
         PriceClass: 'PriceClass_100'
