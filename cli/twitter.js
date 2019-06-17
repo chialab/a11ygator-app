@@ -1,6 +1,7 @@
+const { URL } = require('url');
+
 const prompts = require('prompts');
 const Twit = require('twit');
-
 const { spinner } = require('./index.js');
 
 /** @typedef {{ consumerKey: string, consumerSecret: string, oauthToken: string, oauthTokenSecret: string }} TwitterConfig */
@@ -53,12 +54,12 @@ const getTwitterClient = async (config) => {
  * Ensure Webhook URL is registered.
  * If necessary, unregister other webhooks.
  *
- * @param {Partial<TwitterConfig> & { webhookUrl?: string | URL }} args Command arguments.
+ * @param {Partial<TwitterConfig> & { apiUrl?: string | URL }} args Command arguments.
  * @returns {Promise<void>}
  */
 exports.registerWebhook = async (args) => {
   const T = await getTwitterClient(args);
-  const url = args.webhookUrl;
+  const url = new URL('webhook/twitter', args.apiUrl);
 
   // Fetch list of all webhooks.
   spinner.prefixText = 'Fetching webhooks...';
