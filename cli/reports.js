@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 const { URL } = require('url');
 const http = require('http');
 const https = require('https');
@@ -7,8 +5,8 @@ const https = require('https');
 process.env.AWS_SDK_LOAD_CONFIG = true;
 const AWS = require('aws-sdk');
 const aws4 = require('aws4');
-const inquirer = require('inquirer');
-inquirer.registerPrompt('datetime', require('inquirer-datepicker-prompt'));
+const prompts = require('prompts');
+const { spinner } = require('./index.js');
 
 /**
  * Load AWS Credentials.
@@ -16,25 +14,30 @@ inquirer.registerPrompt('datetime', require('inquirer-datepicker-prompt'));
  * @returns {Promise<AWS.Credentials>}
  */
 const loadCredentials = () => new Promise((resolve, reject) => {
+  spinner.prefixText = 'Loading AWS credentials...';
+  spinner.start();
   AWS.config.getCredentials((err) => {
     if (err) {
+      spinner.fail('failed');
       reject(err);
+    } else {
+      spinner.succeed('done');
+      resolve(AWS.config.credentials);
     }
-    resolve(AWS.config.credentials);
   });
 });
 
 /**
  * Send a request signed with SIGv4.
  *
- * @param {https.RequestOptions & { service?: string, region?: string, body?: Buffer | string }} opts Request options.
+ * @param {http.RequestOptions & { service?: string, region?: string, body?: Buffer | string }} opts Request options.
  * @param {AWS.Credentials | undefined} credentials
  * @returns {Promise<http.IncomingMessage & { body: Buffer }>}
  */
 const request = (requestOptions, credentials) => new Promise((resolve, reject) => {
   requestOptions = aws4.sign(requestOptions, credentials);
 
-  https
+  (requestOptions.protocol === 'https:' ? https : http)
     .request(requestOptions, (res) => {
       let body = Buffer.alloc(0);
       res
@@ -50,51 +53,74 @@ const request = (requestOptions, credentials) => new Promise((resolve, reject) =
     .end(requestOptions.body || '');
 });
 
-(async () => {
-  const { url, schedule, confirm } = await inquirer.prompt([
+/**
+ * Schedule a report.
+ *
+ * @param {{ apiUrl: URL }} argv Command arguments.
+ * @returns {Promise<boolean>}
+ */
+exports.schedule = async ({ apiUrl }) => {
+  const { url, schedule, confirm } = await prompts([
     {
-      type: 'input',
+      type: 'text',
       name: 'url',
       message: 'What URL would you like A11ygator to check?',
-      filter: (input) => new URL(input),
+      format: (input) => new URL(input),
+      validate: (input) => {
+        try {
+          new URL(input);
+
+          return true;
+        } catch (err) {
+          return err.message;
+        }
+      },
     },
     {
-      type: 'datetime',
+      type: 'date',
       name: 'schedule',
       message: 'When would you like to schedule the report?',
-      format: ['dd', '/', 'mm', '/', 'yyyy', ' ', 'HH', ':', 'MM'],
+      initial: new Date(),
+      validate: (date) => date <= new Date() ? 'Unable to schedule a report for a past date' : true,
     },
     {
       type: 'confirm',
       name: 'confirm',
-      message: (answers) => `Do you really want to schedule a report for ${answers.url} on ${answers.schedule.toLocaleString()}?`,
-      default: false,
+      message: (_, answers) => `Do you really want to schedule a report for ${answers.url} on ${answers.schedule.toLocaleString()}?`,
+      initial: true,
     },
   ]);
-
   if (!confirm) {
     console.log('Aborting');
 
-    process.exit(1);
+    return false;
   }
 
+  const scheduleUrl = new URL('schedules', apiUrl);
   const credentials = await loadCredentials();
-  console.time('Scheduling report');
+
+  spinner.prefixText = 'Scheduling report...';
+  spinner.start();
   const response = await request(
     {
       service: 'execute-api',
       region: 'eu-west-1',
       method: 'POST',
-      host: 'sta344f5bg.execute-api.eu-west-1.amazonaws.com',
-      path: '/api/schedules',
+      protocol: scheduleUrl.protocol,
+      host: scheduleUrl.host,
+      path: scheduleUrl.pathname,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url, schedule }),
     },
     credentials
   );
-  console.timeEnd('Scheduling report');
+  if (response.statusCode >= 400) {
+    spinner.fail('fail');
 
-  console.log(`HTTP/${response.httpVersion} ${response.statusCode} ${response.statusMessage}`);
-  const report = JSON.parse(response.body);
-  console.log(report);
-})();
+    throw new Error(`Got error ${response.statusCode} ${response.statusMessage}`);
+  }
+
+  spinner.succeed('done');
+
+  return true;
+};

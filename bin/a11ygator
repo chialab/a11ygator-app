@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const dotenv = require('dotenv');
+const yargs = require('yargs');
+
+// Load environment variables from file, if necessary.
+const { envFile } = yargs
+  .option('env-file', { type: 'string', description: 'Load environment variables from this file' })
+  .help(false)
+  .parse();
+if (envFile) {
+  dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+}
+
+require('../cli/index.js').builder.parse();
