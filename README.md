@@ -35,6 +35,11 @@ A11ygator infrastructure is documented [here](./docs/infrastructure.md).
 
 In this repository you can find source code for A11ygator web app and Twitter bot.
 
+## Using the CLI
+
+Keeping the A11ygator under control is a dirty job.
+This repository includes a [CLI](./docs/cli.md) to facilitate zookeepers' work.
+
 ## Learn more
 
 We now have also an official browsers extension. Check out the [A11ygator Extension repository](https://github.com/chialab/a11ygator-extension).
