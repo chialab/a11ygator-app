@@ -10,15 +10,15 @@ Command Line Interface
 
 This repository includes a CLI to make zookeeping tasks a breeze.
 
-### Launch the CLI
+#### Launch the CLI
 
 ```
 bin/a11ygator
 ```
 
-#### Loading environment variables
-
-If you have a `.env` file, you can load it setting the flag `--env-file=.env`.
+In order to use the CLI, you first have to set environment variables.
+It is possible to load variables as CLI arguments (i.e. `--stack-name` for StackName variable) or to load them all using an `.env` file.
+You can load that file setting the flag `--env-file=.env`.
 
 #### Fetching metadata from CloudFormation
 
