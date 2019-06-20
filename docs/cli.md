@@ -10,6 +10,12 @@ Command Line Interface
 
 This repository includes a CLI to make zookeeping tasks a breeze.
 
+### Launch the CLI
+
+```
+bin/a11ygator
+```
+
 #### Loading environment variables
 
 If you have a `.env` file, you can load it setting the flag `--env-file=.env`.
