@@ -34,7 +34,7 @@ const formatMessage = ({ id, url, report, source }) => {
     prefix = schedulePrefix[Math.floor(Math.random() * schedulePrefix.length)];
   }
 
-  return `${prefix}\nI found ${counts.notice} notices, ${counts.warning} warnings, ${counts.error} errors.\nVisit the link below to access the complete report https://${HOSTNAME}/api/reports/${id}?format=html`;
+  return `${prefix}\nI found ${counts.error} errors, ${counts.warning} warnings, ${counts.notice} notices.\nVisit the link below to access the complete report https://${HOSTNAME}/api/reports/${id}?format=html`;
 };
 
 /**
