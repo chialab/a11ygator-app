@@ -60,7 +60,7 @@ const request = (requestOptions, credentials) => new Promise((resolve, reject) =
  * @returns {Promise<boolean>}
  */
 exports.schedule = async ({ apiUrl }) => {
-  const { url, schedule, confirm } = await prompts([
+  const { url, schedule, confirm, mention } = await prompts([
     {
       type: 'text',
       name: 'url',
@@ -84,15 +84,26 @@ exports.schedule = async ({ apiUrl }) => {
       validate: (date) => date <= new Date() ? 'Unable to schedule a report for a past date' : true,
     },
     {
+      type: 'text',
+      name: 'mention',
+      message: 'Which account would you like A11ygator to mention on the report tweet? (optional)',
+    },
+    {
       type: 'confirm',
       name: 'confirm',
-      message: (_, answers) => `Do you really want to schedule a report for ${answers.url} on ${answers.schedule.toLocaleString()}?`,
+      message: (_, answers) => {
+        let text = `Do you really want to schedule a report for ${answers.url} on ${answers.schedule.toLocaleString()}`;
+        const mention = answers.mention || '';
+        if (mention) {
+          text += ` mentioning ${mention}`;
+        }
+        return text += '?';
+      },
       initial: true,
     },
   ]);
   if (!confirm) {
     console.log('Aborting');
-
     return false;
   }
 
@@ -101,6 +112,8 @@ exports.schedule = async ({ apiUrl }) => {
 
   spinner.prefixText = 'Scheduling report...';
   spinner.start();
+
+  const body = mention ? JSON.stringify({ url, schedule, mention }) : JSON.stringify({ url, schedule });
   const response = await request(
     {
       service: 'execute-api',
@@ -110,7 +123,7 @@ exports.schedule = async ({ apiUrl }) => {
       host: scheduleUrl.host,
       path: scheduleUrl.pathname,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, schedule }),
+      body,
     },
     credentials
   );
