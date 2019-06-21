@@ -11,10 +11,10 @@ const StepFunctions = new AWS.StepFunctions({ apiVersion: '2016-11-23' });
 /**
  * Start state machine with report generation requests received via API Gateway.
  *
- * @param {{ url: string, schedule: string, config?: { wait?: number, standard?: string } }} event Report generation request.
+ * @param {{ url: string, schedule: string, mention: string, config?: { wait?: number, standard?: string } }} event Report generation request.
  * @returns {Promise<{ id: string, url: string }>}
  */
-exports.handler = async ({ url, schedule, config }) => {
+exports.handler = async ({ url, schedule, mention, config }) => {
   url = new URL(url);
 
   const id = uuid4();
@@ -32,20 +32,25 @@ exports.handler = async ({ url, schedule, config }) => {
     ScheduledTimestamp: scheduledFrom.valueOf(),
     Source: source,
   };
+
+  if (mention) {
+    item.Mention = mention;
+  }
+
   console.time('Save info');
   await DDB.put({ TableName: REPORTS_TABLE, Item: item }).promise();
   console.timeEnd('Save info');
 
-  const message = JSON.stringify({ id, url, config, source });
+  const message = JSON.stringify({ id, url, mention, config, source });
 
   // Start step function that will eventually generate report.
   console.time('Schedule report');
   await StepFunctions.startExecution({
     name: id,
     stateMachineArn: SCHEDULED_REPORTS_STATE_MACHINE,
-    input: JSON.stringify({ scheduledFrom, message }),
+    input: JSON.stringify({ scheduledFrom, mention, message }),
   }).promise();
   console.timeEnd('Schedule report');
 
-  return { id, url };
+  return { id, url, mention };
 };

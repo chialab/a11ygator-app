@@ -19,22 +19,25 @@ const T = new Twit({
  * @param {Message} data Data.
  * @return {string}
  */
-const formatMessage = ({ id, url, report, source }) => {
+const formatMessage = ({ id, url, mention, report, source }) => {
   const counts = report.counts;
   console.log(`Report: ${counts.error} ERRORS / ${counts.warning} WARNINGS / ${counts.notice} NOTICES`);
 
   let prefix = `Here's your report!`;
+
   if (isScheduled({ source })) {
     const schedulePrefix = [
       `Today I checked ${url}. Guess what?`,
       `Today, on my journey to make the World a more accessible place, I have checked ${url}.`,
     ];
 
+    const mentioning = mention ? `Hey @${mention}! ` : '';
+
     // randomly select a prefix
-    prefix = schedulePrefix[Math.floor(Math.random() * schedulePrefix.length)];
+    prefix = `${mentioning}${schedulePrefix[Math.floor(Math.random() * schedulePrefix.length)]}`;
   }
 
-  return `${prefix}\nI found ${counts.error} errors, ${counts.warning} warnings, ${counts.notice} notices.\nVisit the link below to access the complete report https://${HOSTNAME}/api/reports/${id}?format=html`;
+  return `${prefix}\nI found ${counts.error} errors, ${counts.warning} warnings, ${counts.notice} notices.\nVisit the link below to access the complete report https://${HOSTNAME}/api/reports/${id}?format=html\n#accessibility`;
 };
 
 /**
