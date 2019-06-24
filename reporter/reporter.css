@@ -193,7 +193,7 @@
     font-size: 2em;
 }
 
-.download-report {
+.report-title-container a {
   font-size: 1.5em;
   margin-left: 1em;
   color: #fff;
@@ -206,7 +206,7 @@
   transition: all 150ms ease-out;
 }
 
-.download-report:hover {
+.report-title-container a:hover {
     background-color: #1b7bbc;
 }
 
