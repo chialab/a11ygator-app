@@ -86,6 +86,7 @@ exports.schedule = async ({ apiUrl }) => {
     {
       type: 'text',
       name: 'mention',
+      format: (mentionString) => mentionString.startsWith('@') ? mentionString.substr(1) : mentionString,
       message: 'Which account would you like A11ygator to mention on the report tweet? (optional)',
     },
     {
@@ -129,7 +130,6 @@ exports.schedule = async ({ apiUrl }) => {
   );
   if (response.statusCode >= 400) {
     spinner.fail('fail');
-
     throw new Error(`Got error ${response.statusCode} ${response.statusMessage}`);
   }
 

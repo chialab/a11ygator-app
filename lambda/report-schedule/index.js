@@ -11,7 +11,7 @@ const StepFunctions = new AWS.StepFunctions({ apiVersion: '2016-11-23' });
 /**
  * Start state machine with report generation requests received via API Gateway.
  *
- * @param {{ url: string, schedule: string, mention: string, config?: { wait?: number, standard?: string } }} event Report generation request.
+ * @param {{ url: string, schedule: string, mention?: string, config?: { wait?: number, standard?: string } }} event Report generation request.
  * @returns {Promise<{ id: string, url: string }>}
  */
 exports.handler = async ({ url, schedule, mention, config }) => {
