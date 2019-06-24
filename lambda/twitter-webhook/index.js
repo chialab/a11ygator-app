@@ -84,8 +84,9 @@ exports.handler = async ({ signature, body }) => {
   // Filter tweets, and prepare messages to be sent to queue.
   const currentUserId = data.for_user_id;
   let tweets = data.tweet_create_events
-    .filter((tweet) => {
-      if (currentUserId === tweet.user.id_str) {
+  .filter((tweet) => {
+    console.log(JSON.stringify(tweet))
+    if (currentUserId === tweet.user.id_str) {
         // Ignore A11ygator tweets quoting himself.
         return false;
       }
@@ -98,6 +99,11 @@ exports.handler = async ({ signature, body }) => {
       const mentions = tweet.entities.user_mentions || [];
       if (!mentions.some((elem) => elem.id_str === currentUserId)) {
         // Ignore tweets where current user is not amongst mentioned users.
+        return false;
+      }
+
+      if (tweet.retweeted_status) {
+        // Ignore retweets.
         return false;
       }
 
