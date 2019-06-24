@@ -915,6 +915,8 @@ Resources:
                 url:
                   type: 'string'
                   format: 'url'
+                mention:
+                  type: 'string'
                 schedule:
                   type: 'string'
                   format: 'date-time'
