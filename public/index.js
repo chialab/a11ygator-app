@@ -80,7 +80,7 @@ self.sendData = function (ev) {
 }
 
 self.addCopyLinkButton = (link, container) => {
-  const titleContainer = container.querySelector('.report-title-container');
+  const titleContainer = container.querySelector('.report-title-container .buttons');
   const a = document.createElement('a');
   a.href = link;
   a.target = '_blank';
