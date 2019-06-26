@@ -19,8 +19,10 @@
 		<div class="pa11y-page">
 
             <div tabindex="0" class="report-title-container">
-			    <h1>Accessibility report for <a href="<%= data.pageUrl %>" target="_blank"><%= data.documentTitle %></a></h1>
-                <a class="download-report" aria-label="download report" href="<%= data.jsonPath %>" download="report.json">Download</a>
+			    <h1>Accessibility report for <a class="hostname" href="<%= data.pageUrl %>" target="_blank"><%= data.documentTitle %></a></h1>
+              <div class="buttons">
+              <a class="download-report" aria-label="download report" href="<%= data.jsonPath %>" download="report.json">Download</a>
+              </div>
             </div>
 
 			<% if (data.screenPath) { %>
