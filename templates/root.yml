@@ -172,6 +172,14 @@ Resources:
               KeyType: 'HASH'
           Projection:
             ProjectionType: 'KEYS_ONLY'
+        - IndexName: 'Schedule'
+          KeySchema:
+            - AttributeName: 'Source'
+              KeyType: 'HASH'
+            - ScheduledTimestamp: 'ScheduledTimestamp'
+              KeyType: 'RANGE'
+          Projection:
+            ProjectionType: 'ALL'
       BillingMode: 'PAY_PER_REQUEST'
 
   ##########################################
@@ -503,6 +511,51 @@ Resources:
       Principal: 'apigateway.amazonaws.com'
       SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/*/POST/schedules'
 
+  #######################################################
+  ### Function to schedule report generation requests ###
+  #######################################################
+  ReportScheduleListRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      Policies:
+        - PolicyName: 'ListScheduledReport'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: 'QueryBySource'
+                Effect: 'Allow'
+                Action: 'dynamodb:Query'
+                Resource: !Sub '${ReportsTable.Arn}/index/Schedule'
+  ReportScheduleListFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Layers:
+        - !Ref 'UuidLayer'
+      Code: '../lambda/report-schedules-list'
+      Description: !Sub 'List scheduled reports for ${AWS::StackName}.'
+      Environment:
+        Variables:
+          REPORTS_TABLE: !Ref 'ReportsTable'
+      Handler: 'index.handler'
+      Role: !GetAtt 'ReportScheduleListRole.Arn'
+      Runtime: 'nodejs10.x'
+  ReportScheduleListFunctionPermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !GetAtt 'ReportScheduleListFunction.Arn'
+      Action: 'lambda:InvokeFunction'
+      Principal: 'apigateway.amazonaws.com'
+      SourceArn: !Sub 'arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${Api}/*/GET/schedules'
+
   ###########################################################
   ### Function to handle Twitter Challenge Response Check ###
   ###########################################################
@@ -762,6 +815,22 @@ Resources:
                 httpMethod: 'POST'
                 uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ReportViewFunction.Arn}/invocations'
           /schedules:
+            get:
+              description: 'List scheduled reports.'
+              security:
+                - sigv4: []
+              x-amazon-apigateway-request-validator: 'all'
+              responses:
+                '200':
+                  description: 'List of scheduled reports.'
+                  content:
+                    application/json:
+                      schema:
+                        $ref: '#/components/schemas/ReportScheduleListResponse'
+              x-amazon-apigateway-integration:
+                type: 'aws_proxy'
+                httpMethod: 'POST'
+                uri: !Sub 'arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ReportScheduleListFunction.Arn}/invocations'
             post:
               description: 'Schedule report generation.'
               security:
