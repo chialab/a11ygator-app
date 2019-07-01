@@ -54,6 +54,15 @@ exports.builder = yargs
         }),
         [stackOutputsMiddleware],
       )
+      .command(
+        'manage-scheduled',
+        'Manage scheduled reports',
+        {},
+        (argv) => require('./reports.js').manageScheduled({
+          apiUrl: argv['api-url'],
+        }),
+        [stackOutputsMiddleware],
+      )
       .demandCommand(),
   )
   .command(

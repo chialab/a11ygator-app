@@ -137,3 +137,44 @@ exports.schedule = async ({ apiUrl }) => {
 
   return true;
 };
+
+exports.manageScheduled = async ({ apiUrl }) => {
+  const scheduleUrl = new URL('schedules', apiUrl);
+  const credentials = await loadCredentials();
+
+  spinner.prefixText = 'Listing reports...';
+  spinner.start();
+
+  const response = await request(
+    {
+      service: 'execute-api',
+      region: 'eu-west-1',
+      method: 'GET',
+      protocol: scheduleUrl.protocol,
+      host: scheduleUrl.host,
+      path: scheduleUrl.pathname,
+      headers: { 'Content-Type': 'application/json' },
+    },
+    credentials
+  );
+  if (response.statusCode >= 400) {
+    spinner.fail('fail');
+    throw new Error(`Got error ${response.statusCode} ${response.statusMessage}`);
+  }
+  const reports = JSON.parse(response.body.toString());
+
+  spinner.succeed('done');
+
+  const { selected } = await prompts({
+    name: 'selected',
+    message: 'Select one or more scheduled reports to delete',
+    type: 'multiselect',
+    choices: reports.map((report) => ({
+      title: `${report.id} [${report.url}] on ${report.schedule}${report.mention ? ` mentioning ${report.mention}` : ''}`,
+      value: report,
+    })),
+  });
+  console.log('user chose', selected); // TODO: delete
+
+  return true;
+};
