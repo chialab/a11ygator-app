@@ -146,6 +146,10 @@ Resources:
           AttributeType: 'S'
         - AttributeName: 'TweetId'
           AttributeType: 'S'
+        - AttributeName: 'Source'
+          AttributeType: 'S'
+        - AttributeName: 'ScheduledTimestamp'
+          AttributeType: 'N'
       KeySchema:
         - AttributeName: 'Id'
           KeyType: 'HASH'
@@ -176,7 +180,7 @@ Resources:
           KeySchema:
             - AttributeName: 'Source'
               KeyType: 'HASH'
-            - ScheduledTimestamp: 'ScheduledTimestamp'
+            - AttributeName: 'ScheduledTimestamp'
               KeyType: 'RANGE'
           Projection:
             ProjectionType: 'ALL'
@@ -538,8 +542,6 @@ Resources:
   ReportScheduleListFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
-      Layers:
-        - !Ref 'UuidLayer'
       Code: '../lambda/report-schedules-list'
       Description: !Sub 'List scheduled reports for ${AWS::StackName}.'
       Environment:

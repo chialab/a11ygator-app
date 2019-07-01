@@ -8,22 +8,27 @@ const DDB = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
  * Start state machine with report generation requests received via API Gateway.
  *
  * @param {{ queryStringParameters?: { filter?: 'future' } }} event API event.
- * @returns {Promise<{ headers: {} }>}
+ * @returns {Promise<{ statusCode: number, headers?: { [x: string]: string }, body?: string }>}
  */
 exports.handler = async (event) => {
   const allSchedules = await DDB.query({
     TableName: REPORTS_TABLE,
     IndexName: 'Schedule',
-    KeyConditionExpression: 'Source = :source AND ScheduledTimestamp > :now',
+    KeyConditionExpression: '#source = :source AND #scheduledTimestamp > :now',
+    ExpressionAttributeNames: {
+      '#source': 'Source',
+      '#scheduledTimestamp': 'ScheduledTimestamp',
+    },
     ExpressionAttributeValues: {
       ':source': 'schedule',
       ':now': Date.now(),
     },
   }).promise();
 
-  const items = allSchedules.Items.map((item) => ({ id: item.Id, url: item.Url, schedule: new Date(ScheduledTimestamp), mention: item.Mention || null }));
+  const items = allSchedules.Items.map((item) => ({ id: item.Id, url: item.Url, schedule: new Date(item.ScheduledTimestamp), mention: item.Mention || null }));
 
   return {
+    statusCode: 200,
     headers: {
       'Content-Type': 'application/json',
     },
