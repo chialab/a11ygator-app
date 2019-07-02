@@ -169,6 +169,12 @@ exports.manageScheduled = async ({ apiUrl }) => {
   }
   const reports = JSON.parse(response.body.toString());
 
+  if (!reports || !reports.length) {
+    spinner.info('no planned reports');
+
+    return true;
+  }
+
   spinner.succeed('done');
 
   const { selected } = await prompts({
