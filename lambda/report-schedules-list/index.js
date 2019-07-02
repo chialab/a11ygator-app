@@ -5,7 +5,7 @@ const REPORTS_TABLE = process.env.REPORTS_TABLE;
 const DDB = new AWS.DynamoDB.DocumentClient({ apiVersion: '2012-08-10' });
 
 /**
- * Start state machine with report generation requests received via API Gateway.
+ * List upcoming scheduled reports.
  *
  * @param {{ queryStringParameters?: { filter?: 'future' } }} event API event.
  * @returns {Promise<{ statusCode: number, headers?: { [x: string]: string }, body?: string }>}
