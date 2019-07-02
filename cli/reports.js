@@ -180,7 +180,42 @@ exports.manageScheduled = async ({ apiUrl }) => {
       value: report,
     })),
   });
-  console.log('user chose', selected); // TODO: delete
+
+  for (const report of selected) {
+    await this.delete({ apiUrl, id: report.id });
+  }
+
+  return true;
+};
+
+/**
+ * Delete report.
+ *
+ * @param {{ apiUrl: URL, id: string }} argv Command arguments.
+ * @returns {Promise<boolean>}
+ */
+exports.delete = async ({ apiUrl, id }) => {
+  const scheduleUrl = new URL(`reports/${id}`, apiUrl);
+  const credentials = await loadCredentials();
+
+  spinner.prefixText = `Deleting report ${id}...`;
+  spinner.start();
+  const response = await request(
+    {
+      service: 'execute-api',
+      region: 'eu-west-1',
+      method: 'DELETE',
+      protocol: scheduleUrl.protocol,
+      host: scheduleUrl.host,
+      path: scheduleUrl.pathname,
+    },
+    credentials
+  );
+  if (response.statusCode >= 400) {
+    spinner.fail('fail');
+    throw new Error(`Got error ${response.statusCode} ${response.statusMessage}`);
+  }
+  spinner.succeed('done');
 
   return true;
 };
