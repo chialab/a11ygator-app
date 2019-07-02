@@ -49,7 +49,7 @@ const deleteReportData = async (id) => {
       Bucket: S3_BUCKET,
       Key: screenshotKey,
     }).promise(),
-    S3.deleteObject({å
+    S3.deleteObject({
       Bucket: S3_BUCKET,
       Key: fullPageScreenshotKey,
     }).promise(),
@@ -58,7 +58,7 @@ const deleteReportData = async (id) => {
 };
 
 /**
- * Stop step function execute that would eventually enqueue report generation.
+ * Stop step function execution that would eventually enqueue report generation.
  *
  * @param {string} id Report ID.
  * @returns {Promise<void>}
