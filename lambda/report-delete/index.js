@@ -45,11 +45,11 @@ const deleteReportData = async (id) => {
       Bucket: S3_BUCKET,
       Key: reportKey,
     }).promise(),
-    S3.putObject({
+    S3.deleteObject({
       Bucket: S3_BUCKET,
       Key: screenshotKey,
     }).promise(),
-    S3.putObject({
+    S3.deleteObject({å
       Bucket: S3_BUCKET,
       Key: fullPageScreenshotKey,
     }).promise(),
