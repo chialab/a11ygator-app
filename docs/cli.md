@@ -38,6 +38,11 @@ Manage reports.
 Schedules a report for future generation. The CLI will interactively ask the URL
 to analyze and the time at which generate the report.
 
+#### `reports manage-scheduled`
+
+List reports scheduled to be generated in the future. The CLI will let the user
+interactively choose one or more schedules to abort.
+
 ### Twitter management
 
 Manage Twitter bot.
