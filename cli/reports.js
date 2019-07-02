@@ -138,6 +138,12 @@ exports.schedule = async ({ apiUrl }) => {
   return true;
 };
 
+/**
+ * List and optionally delete scheduled reports.
+ *
+ * @param {{ apiUrl: URL }} argv Command arguments.
+ * @returns {Promise<boolean>}
+ */
 exports.manageScheduled = async ({ apiUrl }) => {
   const scheduleUrl = new URL('schedules', apiUrl);
   const credentials = await loadCredentials();
