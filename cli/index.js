@@ -21,7 +21,7 @@ const stackOutputsMiddleware = async (argv) => {
 
   const CloudFormation = new AWS.CloudFormation({ apiVersion: '2010-05-15' });
 
-  spinner.prefixText = 'Getting Stack outputs...';
+  spinner.prefixText = `Getting Stack outputs for "${argv['stack-name']}"...`;
   spinner.start();
   const { Stacks } = await CloudFormation.describeStacks({ StackName: argv['stack-name'] }).promise();
   const outputs = Stacks[0].Outputs.reduce(
@@ -50,6 +50,15 @@ exports.builder = yargs
         'Schedule a report',
         {},
         (argv) => require('./reports.js').schedule({
+          apiUrl: argv['api-url'],
+        }),
+        [stackOutputsMiddleware],
+      )
+      .command(
+        'manage-scheduled',
+        'Manage scheduled reports',
+        {},
+        (argv) => require('./reports.js').manageScheduled({
           apiUrl: argv['api-url'],
         }),
         [stackOutputsMiddleware],

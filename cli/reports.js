@@ -137,3 +137,91 @@ exports.schedule = async ({ apiUrl }) => {
 
   return true;
 };
+
+/**
+ * List and optionally delete scheduled reports.
+ *
+ * @param {{ apiUrl: URL }} argv Command arguments.
+ * @returns {Promise<boolean>}
+ */
+exports.manageScheduled = async ({ apiUrl }) => {
+  const scheduleUrl = new URL('schedules', apiUrl);
+  const credentials = await loadCredentials();
+
+  spinner.prefixText = 'Listing reports...';
+  spinner.start();
+
+  const response = await request(
+    {
+      service: 'execute-api',
+      region: 'eu-west-1',
+      method: 'GET',
+      protocol: scheduleUrl.protocol,
+      host: scheduleUrl.host,
+      path: scheduleUrl.pathname,
+      headers: { 'Content-Type': 'application/json' },
+    },
+    credentials
+  );
+  if (response.statusCode >= 400) {
+    spinner.fail('fail');
+    throw new Error(`Got error ${response.statusCode} ${response.statusMessage}`);
+  }
+  const reports = JSON.parse(response.body.toString());
+
+  if (!reports || !reports.length) {
+    spinner.info('no planned reports');
+
+    return true;
+  }
+
+  spinner.succeed('done');
+
+  const { selected } = await prompts({
+    name: 'selected',
+    message: 'Select one or more scheduled reports to delete',
+    type: 'multiselect',
+    choices: reports.map((report) => ({
+      title: `${report.id} [${report.url}] on ${report.schedule}${report.mention ? ` mentioning ${report.mention}` : ''}`,
+      value: report,
+    })),
+  });
+
+  for (const report of selected) {
+    await this.delete({ apiUrl, id: report.id });
+  }
+
+  return true;
+};
+
+/**
+ * Delete report.
+ *
+ * @param {{ apiUrl: URL, id: string }} argv Command arguments.
+ * @returns {Promise<boolean>}
+ */
+exports.delete = async ({ apiUrl, id }) => {
+  const scheduleUrl = new URL(`reports/${id}`, apiUrl);
+  const credentials = await loadCredentials();
+
+  spinner.prefixText = `Deleting report ${id}...`;
+  spinner.start();
+  const response = await request(
+    {
+      service: 'execute-api',
+      region: 'eu-west-1',
+      method: 'DELETE',
+      protocol: scheduleUrl.protocol,
+      host: scheduleUrl.host,
+      path: scheduleUrl.pathname,
+    },
+    credentials
+  );
+  if (response.statusCode >= 400) {
+    spinner.fail('fail');
+    throw new Error(`Got error ${response.statusCode} ${response.statusMessage}`);
+  }
+  spinner.succeed('done');
+
+  return true;
+};
