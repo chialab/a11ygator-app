@@ -127,6 +127,7 @@ exports.handler = async ({ pathParameters, requestContext }) => {
     // Report is neither completed nor scheduled, thus is being generated right now.
     // Refuse to delete a report being generated now to avoid creating orphaned files on S3.
     const message = `Refusing to delete a report that is being generated right now: ${id}`;
+    console.error(message);
 
     return {
       statusCode: 423,
