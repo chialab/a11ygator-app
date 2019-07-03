@@ -61,9 +61,10 @@ const deleteReportData = async (id) => {
  * Stop step function execution that would eventually enqueue report generation.
  *
  * @param {string} id Report ID.
+ * @param {string} cause Abort cause.
  * @returns {Promise<void>}
  */
-const stopStepFunction = async (id) => {
+const stopStepFunction = async (id, cause = 'Aborted via API') => {
   console.time('Listing step function executions');
   const list = await StepFunctions.listExecutions({
     stateMachineArn: SCHEDULED_REPORTS_STATE_MACHINE,
@@ -81,7 +82,7 @@ const stopStepFunction = async (id) => {
   console.time('Stopping step function execution');
   await StepFunctions.stopExecution({
     executionArn: execution.executionArn,
-    cause: `Aborted on ${new Date().toUTCString()}.`,
+    cause,
   }).promise();
   console.timeEnd('Stopping step function execution');
 };
@@ -104,10 +105,10 @@ const deleteInfo = async (id) => {
 /**
  * Start state machine with report generation requests received via API Gateway.
  *
- * @param {{ pathParameters: { id: string } }} event API event.
+ * @param {{ pathParameters: { id: string }, requestContext: { identity: { userArn: string, sourceIp: string } } }} event API event.
  * @returns {Promise<{ statusCode: number, headers?: { [x: string]: string }, body?: string }>}
  */
-exports.handler = async ({ pathParameters }) => {
+exports.handler = async ({ pathParameters, requestContext }) => {
   const { id } = pathParameters;
 
   const info = await getInfo(id);
@@ -121,7 +122,7 @@ exports.handler = async ({ pathParameters }) => {
     await deleteReportData(id);
   } else if (info.Source === 'schedule' && info.ScheduledTimestamp > Date.now()) {
     // Abort scheduled report.
-    await stopStepFunction(id);
+    await stopStepFunction(id, `Aborted by ${requestContext.identity.userArn} - IP: ${requestContext.identity.sourceIp}`);
   } else if (!info.ReportError) {
     // Report is neither completed nor scheduled, thus is being generated right now.
     // Refuse to delete a report being generated now to avoid creating orphaned files on S3.
