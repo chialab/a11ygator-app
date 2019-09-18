@@ -1100,4 +1100,3 @@ Resources:
               name: 'Authorization'
               in: 'header'
               x-amazon-apigateway-authtype: 'awsSigv4'
-
