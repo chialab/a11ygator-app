@@ -31,6 +31,12 @@ layers:
 	yarn --cwd layers/twit/nodejs install
 	yarn --cwd layers/uuid/nodejs install
 
+ensure-layer-%:
+	@if ! [[ -d 'layers/$*/nodejs/node_modules' ]]; then \
+		printf '\033[31mDependencies for layer \033[1m%s\033[22m are not installed, run \033[1m%s\033[22m first!\033[0m\n' $* 'make layers'; \
+		exit 1; \
+	fi
+
 deploy: package
 	aws cloudformation deploy \
 		--template-file template.yml \
@@ -39,7 +45,7 @@ deploy: package
 		--capabilities CAPABILITY_IAM \
 		--profile $(DEPLOY_PROFILE)
 
-package: validate
+package: ensure-layer-pa11y ensure-layer-twit ensure-layer-uuid validate
 	yarn run build-reporter
 	aws cloudformation package \
 		--template-file templates/root.yml \
