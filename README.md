@@ -1,15 +1,22 @@
 <p align="center">
-    <img src="./docs/logo.png" width="100">
-    <h1 align="center">A11ygator</h1>
+    <a href="https://www.chialab.io/p/a11ygator-app">
+        <img alt="Allygator logo" width="144" height="144" src="https://raw.githack.com/chialab/a11ygator-app/master/logo.svg" />
+    </a>
 </p>
+
+<p align="center">
+  <strong>A11ygator</strong> • Validate the accessibility of your website against W3C's Web Content Accessibility Guidelines.
+</p>
+
 <p align="center">
     <a href="https://chrome.google.com/webstore/detail/a11ygator/imfmlpemomjmfncnmkjdeeinbkichaio">Chrome extension</a> |
-    <a href="https://addons.mozilla.org/it/firefox/addon/a11ygator">Firefox extension</a> |
-    <a href="https://a11ygator.chialab.io/">WebApp</a> |
+    <a href="https://github.com/chialab/a11ygator-app">Source</a> |
+    <a href="https://a11ygator.chialab.io">WebApp</a> |
     <a href="https://www.w3.org/WAI/standards-guidelines/wcag/">WCAG</a> |
-    <a href="https://github.com/chialab/a11ygator-extension">Source</a> |
-    <a href="https://www.chialab.io">Authors</a>
+    <a href="https://www.chialab.it">Authors</a>
 </p>
+
+---
 
 An application and Twitter bot that bites websites to taste their accessibility.
 
